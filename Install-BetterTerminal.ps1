@@ -1806,7 +1806,7 @@ function Show-ChoiceStudio {
     $header = New-Object System.Windows.Forms.Label
     $header.Dock = 'Top'
     $header.Height = 36
-    $header.Text = "  Everything is already downloaded. $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts. Search stays on this tab."
+    $header.Text = "  Everything is already downloaded. $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts. Search clears when you change tabs."
     $header.TextAlign = 'MiddleLeft'
     $header.BackColor = [System.Drawing.Color]::FromArgb(36, 38, 52)
     $header.Font = New-Object System.Drawing.Font('Segoe UI', 11)
@@ -2059,7 +2059,7 @@ function Show-ChoiceStudio {
     $find.ForeColor = [System.Drawing.Color]::White
 
     $searchHint = New-Object System.Windows.Forms.Label
-    $searchHint.Text = 'stays on this tab'
+    $searchHint.Text = 'clears when you change tabs'
     $searchHint.Location = New-Object System.Drawing.Point(580, 12)
     $searchHint.AutoSize = $true
     $searchHint.ForeColor = [System.Drawing.Color]::FromArgb(140, 150, 168)
@@ -2165,7 +2165,12 @@ function Show-ChoiceStudio {
     $script:PoshGrid = $poshGrid
     $script:StudioTabs = $tabs
     $script:StudioSearch = $searchBox
-    $tabs.Add_SelectedIndexChanged({ Update-StudioSearch })
+    $tabs.Add_SelectedIndexChanged({
+        if ($script:StudioSearch -and $script:StudioSearch.Text) {
+            $script:StudioSearch.Text = ''
+        }
+        Update-StudioSearch
+    })
     $script:GlassSlider = $slider
     $script:GlassBlur = $blur
     $script:StudioUi = @{
