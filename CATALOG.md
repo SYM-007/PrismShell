@@ -1,0 +1,1507 @@
+# Better Terminal catalogs
+
+Complete official lists current on this PC after the helper downloaded them.
+
+| Catalog | Count | Source |
+| --- | ---: | --- |
+| Nerd Fonts | 71 | https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.5.1 |
+| Color themes | 606 | https://github.com/mbadolato/iTerm2-Color-Schemes/tree/master/windowsterminal |
+| Oh My Posh themes | 123 | https://github.com/JanDeDobbeleer/oh-my-posh/tree/main/themes |
+| Fastfetch logos | 639 | `fastfetch --list-logos` |
+
+Read [README.md](README.md) for what the helper does and how to install these by hand.
+
+---
+
+## Nerd Fonts (v3.5.1)
+
+Zip URL: `https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/<Zip>`
+
+| Id | Zip | Download |
+| --- | --- | --- |
+| 0xProto | 0xProto.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/0xProto.zip> |
+| 3270 | 3270.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/3270.zip> |
+| AdwaitaMono | AdwaitaMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/AdwaitaMono.zip> |
+| Agave | Agave.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Agave.zip> |
+| AnnotationMono | AnnotationMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/AnnotationMono.zip> |
+| AnonymousPro | AnonymousPro.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/AnonymousPro.zip> |
+| Arimo | Arimo.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Arimo.zip> |
+| AtkinsonHyperlegibleMono | AtkinsonHyperlegibleMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/AtkinsonHyperlegibleMono.zip> |
+| AurulentSansMono | AurulentSansMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/AurulentSansMono.zip> |
+| BigBlueTerminal | BigBlueTerminal.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/BigBlueTerminal.zip> |
+| BitstreamVeraSansMono | BitstreamVeraSansMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/BitstreamVeraSansMono.zip> |
+| CascadiaCode | CascadiaCode.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/CascadiaCode.zip> |
+| CascadiaMono | CascadiaMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/CascadiaMono.zip> |
+| CodeNewRoman | CodeNewRoman.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/CodeNewRoman.zip> |
+| ComicShannsMono | ComicShannsMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/ComicShannsMono.zip> |
+| CommitMono | CommitMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/CommitMono.zip> |
+| Cousine | Cousine.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Cousine.zip> |
+| D2Coding | D2Coding.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/D2Coding.zip> |
+| DaddyTimeMono | DaddyTimeMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/DaddyTimeMono.zip> |
+| DejaVuSansMono | DejaVuSansMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/DejaVuSansMono.zip> |
+| DepartureMono | DepartureMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/DepartureMono.zip> |
+| DroidSansMono | DroidSansMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/DroidSansMono.zip> |
+| EnvyCodeR | EnvyCodeR.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/EnvyCodeR.zip> |
+| FantasqueSansMono | FantasqueSansMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/FantasqueSansMono.zip> |
+| FiraCode | FiraCode.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/FiraCode.zip> |
+| FiraMono | FiraMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/FiraMono.zip> |
+| GeistMono | GeistMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/GeistMono.zip> |
+| Gohu | Gohu.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Gohu.zip> |
+| Go-Mono | Go-Mono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Go-Mono.zip> |
+| GoogleSansCode | GoogleSansCode.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/GoogleSansCode.zip> |
+| Hack | Hack.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Hack.zip> |
+| Hasklig | Hasklig.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Hasklig.zip> |
+| HeavyData | HeavyData.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/HeavyData.zip> |
+| Hermit | Hermit.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Hermit.zip> |
+| iA-Writer | iA-Writer.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/iA-Writer.zip> |
+| IBMPlexMono | IBMPlexMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/IBMPlexMono.zip> |
+| Inconsolata | Inconsolata.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Inconsolata.zip> |
+| InconsolataGo | InconsolataGo.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/InconsolataGo.zip> |
+| InconsolataLGC | InconsolataLGC.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/InconsolataLGC.zip> |
+| IntelOneMono | IntelOneMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/IntelOneMono.zip> |
+| Iosevka | Iosevka.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Iosevka.zip> |
+| IosevkaTerm | IosevkaTerm.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/IosevkaTerm.zip> |
+| IosevkaTermSlab | IosevkaTermSlab.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/IosevkaTermSlab.zip> |
+| JetBrainsMono | JetBrainsMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.zip> |
+| Lekton | Lekton.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Lekton.zip> |
+| LiberationMono | LiberationMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/LiberationMono.zip> |
+| Lilex | Lilex.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Lilex.zip> |
+| MartianMono | MartianMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MartianMono.zip> |
+| Meslo | Meslo.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Meslo.zip> |
+| Monaspace | Monaspace.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Monaspace.zip> |
+| Monofur | Monofur.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Monofur.zip> |
+| Monoid | Monoid.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Monoid.zip> |
+| Mononoki | Mononoki.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Mononoki.zip> |
+| MPlus | MPlus.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/MPlus.zip> |
+| Noto | Noto.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Noto.zip> |
+| OpenDyslexic | OpenDyslexic.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/OpenDyslexic.zip> |
+| Overpass | Overpass.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Overpass.zip> |
+| ProFont | ProFont.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/ProFont.zip> |
+| ProggyClean | ProggyClean.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/ProggyClean.zip> |
+| Recursive | Recursive.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Recursive.zip> |
+| RobotoMono | RobotoMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/RobotoMono.zip> |
+| ShareTechMono | ShareTechMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/ShareTechMono.zip> |
+| SourceCodePro | SourceCodePro.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/SourceCodePro.zip> |
+| SpaceMono | SpaceMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/SpaceMono.zip> |
+| Terminus | Terminus.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Terminus.zip> |
+| Tinos | Tinos.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Tinos.zip> |
+| Ubuntu | Ubuntu.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Ubuntu.zip> |
+| UbuntuMono | UbuntuMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/UbuntuMono.zip> |
+| UbuntuSans | UbuntuSans.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/UbuntuSans.zip> |
+| VictorMono | VictorMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/VictorMono.zip> |
+| ZedMono | ZedMono.zip | <https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/ZedMono.zip> |
+
+---
+
+## Oh My Posh themes
+
+File URL: `https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/<id>.omp.json`
+
+Preview: https://ohmyposh.dev/docs/themes
+
+- `1_shell` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/1_shell.omp.json
+- `agnoster` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/agnoster.omp.json
+- `agnoster.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/agnoster.minimal.omp.json
+- `agnosterplus` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/agnosterplus.omp.json
+- `aliens` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/aliens.omp.json
+- `amro` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/amro.omp.json
+- `atomic` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomic.omp.json
+- `atomicBit` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/atomicBit.omp.json
+- `avit` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/avit.omp.json
+- `blueish` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/blueish.omp.json
+- `blue-owl` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/blue-owl.omp.json
+- `bubbles` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/bubbles.omp.json
+- `bubblesextra` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/bubblesextra.omp.json
+- `bubblesline` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/bubblesline.omp.json
+- `capr4n` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/capr4n.omp.json
+- `catppuccin` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin.omp.json
+- `catppuccin_frappe` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_frappe.omp.json
+- `catppuccin_latte` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_latte.omp.json
+- `catppuccin_macchiato` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_macchiato.omp.json
+- `catppuccin_mocha` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_mocha.omp.json
+- `cert` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cert.omp.json
+- `chips` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/chips.omp.json
+- `cinnamon` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cinnamon.omp.json
+- `clean-detailed` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/clean-detailed.omp.json
+- `cloud-context` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cloud-context.omp.json
+- `cloud-native-azure` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cloud-native-azure.omp.json
+- `cobalt2` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json
+- `craver` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/craver.omp.json
+- `darkblood` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/darkblood.omp.json
+- `di4am0nd` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/di4am0nd.omp.json
+- `dracula` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/dracula.omp.json
+- `easy-term` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/easy-term.omp.json
+- `emodipt` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/emodipt.omp.json
+- `emodipt-extend` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/emodipt-extend.omp.json
+- `fish` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/fish.omp.json
+- `free-ukraine` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/free-ukraine.omp.json
+- `froczh` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/froczh.omp.json
+- `gmay` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/gmay.omp.json
+- `grandpa-style` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/grandpa-style.omp.json
+- `gruvbox` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/gruvbox.omp.json
+- `half-life` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/half-life.omp.json
+- `honukai` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/honukai.omp.json
+- `hotstick.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/hotstick.minimal.omp.json
+- `hul10` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/hul10.omp.json
+- `hunk` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/hunk.omp.json
+- `huvix` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/huvix.omp.json
+- `if_tea` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/if_tea.omp.json
+- `illusi0n` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/illusi0n.omp.json
+- `iterm2` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/iterm2.omp.json
+- `jandedobbeleer` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jandedobbeleer.omp.json
+- `jandedobbeleer-accessible` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jandedobbeleer-accessible.omp.json
+- `jblab_2021` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jblab_2021.omp.json
+- `jonnychipz` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jonnychipz.omp.json
+- `json` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/json.omp.json
+- `jtracey93` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jtracey93.omp.json
+- `jv_sitecorian` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/jv_sitecorian.omp.json
+- `kali` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/kali.omp.json
+- `kushal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/kushal.omp.json
+- `lambda` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/lambda.omp.json
+- `lambdageneration` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/lambdageneration.omp.json
+- `larserikfinholt` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/larserikfinholt.omp.json
+- `lightgreen` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/lightgreen.omp.json
+- `M365Princess` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/M365Princess.omp.json
+- `marcduiker` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/marcduiker.omp.json
+- `markbull` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/markbull.omp.json
+- `material` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/material.omp.json
+- `microverse-power` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/microverse-power.omp.json
+- `mojada` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/mojada.omp.json
+- `montys` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/montys.omp.json
+- `mt` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/mt.omp.json
+- `multiverse-neon` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/multiverse-neon.omp.json
+- `negligible` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/negligible.omp.json
+- `neko` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/neko.omp.json
+- `night-owl` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/night-owl.omp.json
+- `nordtron` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/nordtron.omp.json
+- `nu4a` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/nu4a.omp.json
+- `onehalf.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/onehalf.minimal.omp.json
+- `paradox` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/paradox.omp.json
+- `pararussel` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/pararussel.omp.json
+- `patriksvensson` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/patriksvensson.omp.json
+- `peru` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/peru.omp.json
+- `pixelrobots` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/pixelrobots.omp.json
+- `plague` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/plague.omp.json
+- `poshmon` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/poshmon.omp.json
+- `powerlevel10k_classic` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/powerlevel10k_classic.omp.json
+- `powerlevel10k_lean` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/powerlevel10k_lean.omp.json
+- `powerlevel10k_modern` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/powerlevel10k_modern.omp.json
+- `powerlevel10k_rainbow` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/powerlevel10k_rainbow.omp.json
+- `powerline` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/powerline.omp.json
+- `probua.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/probua.minimal.omp.json
+- `pure` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/pure.omp.json
+- `quick-term` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/quick-term.omp.json
+- `remk` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/remk.omp.json
+- `robbyrussell` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/robbyrussell.omp.json
+- `rudolfs-dark` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/rudolfs-dark.omp.json
+- `rudolfs-light` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/rudolfs-light.omp.json
+- `sim-web` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/sim-web.omp.json
+- `slim` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/slim.omp.json
+- `slimfat` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/slimfat.omp.json
+- `smoothie` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/smoothie.omp.json
+- `sonicboom_dark` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/sonicboom_dark.omp.json
+- `sonicboom_light` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/sonicboom_light.omp.json
+- `sorin` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/sorin.omp.json
+- `space` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/space.omp.json
+- `spaceship` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/spaceship.omp.json
+- `star` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/star.omp.json
+- `stelbent.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/stelbent.minimal.omp.json
+- `stelbent-compact.minimal` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/stelbent-compact.minimal.omp.json
+- `takuya` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/takuya.omp.json
+- `thecyberden` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/thecyberden.omp.json
+- `the-unnamed` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/the-unnamed.omp.json
+- `tiwahu` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/tiwahu.omp.json
+- `tokyo` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/tokyo.omp.json
+- `tokyonight_storm` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/tokyonight_storm.omp.json
+- `tonybaloney` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/tonybaloney.omp.json
+- `uew` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/uew.omp.json
+- `unicorn` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/unicorn.omp.json
+- `velvet` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/velvet.omp.json
+- `wholespace` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/wholespace.omp.json
+- `wopian` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/wopian.omp.json
+- `xtoys` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/xtoys.omp.json
+- `ys` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/ys.omp.json
+- `zash` - https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/zash.omp.json
+
+---
+
+## Windows Terminal color themes
+
+JSON URL: `https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/<Name>.json`
+
+Browse: https://windowsterminalthemes.dev/
+
+These 606 names are the files saved under `%LOCALAPPDATA%\BetterTerminal\themes\windowsterminal`.
+
+- 0x96f - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/0x96f.json
+- 12-bit Rainbow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/12-bit%20Rainbow.json
+- 3024 Day - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/3024%20Day.json
+- 3024 Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/3024%20Night.json
+- Aardvark Blue - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aardvark%20Blue.json
+- Aardvark Ink - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aardvark%20Ink.json
+- Abernathy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Abernathy.json
+- Acid Lime - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Acid%20Lime.json
+- Adventure Time - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Adventure%20Time.json
+- Adventure - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Adventure.json
+- Adwaita Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Adwaita%20Dark.json
+- Adwaita - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Adwaita.json
+- Afterglow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Afterglow.json
+- Aizen Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aizen%20Dark.json
+- Aizen Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aizen%20Light.json
+- Alabaster - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Alabaster.json
+- Alien Blood - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Alien%20Blood.json
+- Amber CRT Retro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Amber%20CRT%20Retro.json
+- Andromeda - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Andromeda.json
+- Apple Classic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Apple%20Classic.json
+- Apple System Colors Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Apple%20System%20Colors%20Light.json
+- Apple System Colors - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Apple%20System%20Colors.json
+- Arcoiris - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Arcoiris.json
+- Ardoise - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ardoise.json
+- Argonaut - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Argonaut.json
+- Arthur - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Arthur.json
+- Atelier Sulphurpool - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Atelier%20Sulphurpool.json
+- Atlas Ragnarok - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Atlas%20Ragnarok.json
+- Atom One Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Atom%20One%20Dark.json
+- Atom One Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Atom%20One%20Light.json
+- Atom - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Atom.json
+- Aubade - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aubade.json
+- Aura Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aura%20Dark.json
+- Aura - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aura.json
+- Aurora - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Aurora.json
+- Ayu Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ayu%20Light.json
+- Ayu Mirage - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ayu%20Mirage.json
+- Ayu - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ayu.json
+- Banana Blueberry - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Banana%20Blueberry.json
+- base16-icy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/base16-icy.json
+- Batman - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Batman.json
+- Belafonte Day - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Belafonte%20Day.json
+- Belafonte Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Belafonte%20Night.json
+- Birds Of Paradise - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Birds%20Of%20Paradise.json
+- Black Metal (Bathory) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Bathory).json
+- Black Metal (Burzum) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Burzum).json
+- Black Metal (Dark Funeral) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Dark%20Funeral).json
+- Black Metal (Gorgoroth) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Gorgoroth).json
+- Black Metal (Immortal) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Immortal).json
+- Black Metal (Khold) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Khold).json
+- Black Metal (Marduk) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Marduk).json
+- Black Metal (Mayhem) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Mayhem).json
+- Black Metal (Nile) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Nile).json
+- Black Metal (Venom) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal%20(Venom).json
+- Black Metal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Black%20Metal.json
+- Blazer - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Blazer.json
+- Blue Berry Pie - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Blue%20Berry%20Pie.json
+- Blue Dolphin - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Blue%20Dolphin.json
+- Blue Matrix - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Blue%20Matrix.json
+- Bluloco Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Bluloco%20Dark.json
+- Bluloco Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Bluloco%20Light.json
+- Borland - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Borland.json
+- Box - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Box.json
+- branch - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/branch.json
+- Breadog - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Breadog.json
+- Breeze - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Breeze.json
+- Bright Lights - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Bright%20Lights.json
+- Broadcast - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Broadcast.json
+- Brogrammer - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Brogrammer.json
+- Builtin Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Builtin%20Dark.json
+- Builtin Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Builtin%20Light.json
+- Builtin Pastel Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Builtin%20Pastel%20Dark.json
+- Builtin Tango Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Builtin%20Tango%20Dark.json
+- Builtin Tango Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Builtin%20Tango%20Light.json
+- C64 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/C64.json
+- Calamity - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Calamity.json
+- Carbonfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Carbonfox.json
+- Cassette Tape - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cassette%20Tape.json
+- Catppuccin Frappe - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Catppuccin%20Frappe.json
+- Catppuccin Latte - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Catppuccin%20Latte.json
+- Catppuccin Macchiato - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Catppuccin%20Macchiato.json
+- Catppuccin Mocha - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Catppuccin%20Mocha.json
+- CGA - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/CGA.json
+- Chalk - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Chalk.json
+- Chalkboard - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Chalkboard.json
+- Challenger Deep - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Challenger%20Deep.json
+- Chester - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Chester.json
+- Ciapre - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ciapre.json
+- Citrus Ink - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Citrus%20Ink.json
+- Citruszest - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Citruszest.json
+- Claude Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Claude%20Dark.json
+- Claude Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Claude%20Light.json
+- Claude - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Claude.json
+- Clear Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Clear%20Dark.json
+- Clear Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Clear%20Light.json
+- CLRS - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/CLRS.json
+- Cobalt Neon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cobalt%20Neon.json
+- Cobalt Next Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cobalt%20Next%20Dark.json
+- Cobalt Next Minimal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cobalt%20Next%20Minimal.json
+- Cobalt Next - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cobalt%20Next.json
+- Cobalt2 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cobalt2.json
+- Coffee Theme - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Coffee%20Theme.json
+- Cool Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cool%20Night.json
+- Crayon Pony Fish - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Crayon%20Pony%20Fish.json
+- CRT Amber - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/CRT%20Amber.json
+- Cursor Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cursor%20Dark.json
+- Cursor Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cursor%20Light.json
+- Cutie Pro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cutie%20Pro.json
+- Cyberdyne - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cyberdyne.json
+- Cyberpunk Scarlet Protocol - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cyberpunk%20Scarlet%20Protocol.json
+- Cyberpunk - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Cyberpunk.json
+- cyberpunk-icy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/cyberpunk-icy.json
+- Dalton Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dalton%20Dark.json
+- Dark Modern - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dark%20Modern.json
+- Dark Pastel - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dark%20Pastel.json
+- Dark+ - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dark%2B.json
+- Darkermatrix - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Darkermatrix.json
+- Darkmatrix - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Darkmatrix.json
+- Darkside - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Darkside.json
+- datum (dark) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/datum%20(dark).json
+- datum (light) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/datum%20(light).json
+- Dawnfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dawnfox.json
+- Daybreak - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Daybreak.json
+- Dayfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dayfox.json
+- Deep - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Deep.json
+- Desert - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Desert.json
+- Detuned - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Detuned.json
+- Dimidium - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dimidium.json
+- Dimmed Monokai - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dimmed%20Monokai.json
+- Django Reborn Again - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Django%20Reborn%20Again.json
+- Django Smooth - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Django%20Smooth.json
+- Django - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Django.json
+- Dogxi Misty - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dogxi%20Misty.json
+- Doom One - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Doom%20One.json
+- Doom Peacock - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Doom%20Peacock.json
+- Dot Gov - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dot%20Gov.json
+- Dracula - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dracula.json
+- Dracula+ - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Dracula%2B.json
+- Driftwood - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Driftwood.json
+- Duckbones - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Duckbones.json
+- Duotone Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Duotone%20Dark.json
+- Duskfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Duskfox.json
+- Earthsong - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Earthsong.json
+- Eclipse - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Eclipse.json
+- Electron Highlighter Day - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Electron%20Highlighter%20Day.json
+- Electron Highlighter - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Electron%20Highlighter.json
+- Elegant - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Elegant.json
+- Elemental - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Elemental.json
+- Elementary - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Elementary.json
+- Embark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Embark.json
+- Embers Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Embers%20Dark.json
+- Emerald Synth - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Emerald%20Synth.json
+- ENCOM - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/ENCOM.json
+- Espresso Libre - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Espresso%20Libre.json
+- Espresso - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Espresso.json
+- Everblush - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everblush.json
+- Everforest Dark Hard - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Dark%20Hard.json
+- Everforest Dark Med - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Dark%20Med.json
+- Everforest Dark Soft - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Dark%20Soft.json
+- Everforest Light Hard - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Light%20Hard.json
+- Everforest Light Med - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Light%20Med.json
+- Everforest Light Soft - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Everforest%20Light%20Soft.json
+- Fahrenheit - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Fahrenheit.json
+- Fairyfloss - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Fairyfloss.json
+- Farmhouse Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Farmhouse%20Dark.json
+- Farmhouse Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Farmhouse%20Light.json
+- Fideloper - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Fideloper.json
+- Firefly Traditional - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Firefly%20Traditional.json
+- Firefox Dev - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Firefox%20Dev.json
+- Firewatch - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Firewatch.json
+- Fish Tank - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Fish%20Tank.json
+- Flat - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Flat.json
+- Flatland - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Flatland.json
+- Flexoki Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Flexoki%20Dark.json
+- Flexoki Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Flexoki%20Light.json
+- Floraverse - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Floraverse.json
+- Forest Blue - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Forest%20Blue.json
+- Forge Ember - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Forge%20Ember.json
+- Framer - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Framer.json
+- Front End Delight - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Front%20End%20Delight.json
+- Frostbyte - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Frostbyte.json
+- Fun Forrest - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Fun%20Forrest.json
+- Galaxy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Galaxy.json
+- Galizur - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Galizur.json
+- Ghostty Default Style Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ghostty%20Default%20Style%20Dark.json
+- GitHub Dark Colorblind - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Dark%20Colorblind.json
+- GitHub Dark Default - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Dark%20Default.json
+- GitHub Dark Dimmed - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Dark%20Dimmed.json
+- GitHub Dark High Contrast - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Dark%20High%20Contrast.json
+- GitHub Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Dark.json
+- GitHub Light Colorblind - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Light%20Colorblind.json
+- GitHub Light Default - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Light%20Default.json
+- GitHub Light High Contrast - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub%20Light%20High%20Contrast.json
+- GitHub - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitHub.json
+- GitLab Dark Grey - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitLab%20Dark%20Grey.json
+- GitLab Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitLab%20Dark.json
+- GitLab Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/GitLab%20Light.json
+- Glacier - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Glacier.json
+- Gleam Classic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gleam%20Classic.json
+- Gleam - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gleam.json
+- Grape - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Grape.json
+- Graphite - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Graphite.json
+- Grass - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Grass.json
+- Green Phosphor CRT - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Green%20Phosphor%20CRT.json
+- Grey Green - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Grey%20Green.json
+- Grok Day - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Grok%20Day.json
+- Grok Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Grok%20Night.json
+- Gruber Darker - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruber%20Darker.json
+- Gruvbox Dark Hard - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Dark%20Hard.json
+- Gruvbox Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Dark.json
+- Gruvbox Light Hard - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Light%20Hard.json
+- Gruvbox Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Light.json
+- Gruvbox Material Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Material%20Dark.json
+- Gruvbox Material Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Material%20Light.json
+- Gruvbox Material - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Gruvbox%20Material.json
+- Guezwhoz - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Guezwhoz.json
+- Hacktober - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hacktober.json
+- Hardcore - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hardcore.json
+- Harper - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Harper.json
+- Havn Daggry - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Havn%20Daggry.json
+- Havn Skumring - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Havn%20Skumring.json
+- HaX0R Blue - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/HaX0R%20Blue.json
+- HaX0R Gr33N - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/HaX0R%20Gr33N.json
+- HaX0R R3D - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/HaX0R%20R3D.json
+- Heeler - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Heeler.json
+- Highway - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Highway.json
+- Hipster Green - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hipster%20Green.json
+- Hivacruz - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hivacruz.json
+- Homebrew - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Homebrew.json
+- Hopscotch.256 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hopscotch.256.json
+- Hopscotch - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hopscotch.json
+- Horizon Bright - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Horizon%20Bright.json
+- Horizon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Horizon.json
+- Hot Dog Stand (Mustard) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hot%20Dog%20Stand%20(Mustard).json
+- Hot Dog Stand - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hot%20Dog%20Stand.json
+- Hurtado - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hurtado.json
+- Hybrid - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Hybrid.json
+- IBM 5153 CGA (Black) - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IBM%205153%20CGA%20(Black).json
+- IBM 5153 CGA - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IBM%205153%20CGA.json
+- IC Green PPL - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IC%20Green%20PPL.json
+- IC Orange PPL - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IC%20Orange%20PPL.json
+- Iceberg Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Iceberg%20Dark.json
+- Iceberg Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Iceberg%20Light.json
+- Idea - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Idea.json
+- Idle Toes - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Idle%20Toes.json
+- IR Black - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IR%20Black.json
+- IRIX Console - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IRIX%20Console.json
+- IRIX Terminal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/IRIX%20Terminal.json
+- iTerm2 Dark Background - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Dark%20Background.json
+- iTerm2 Default - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Default.json
+- iTerm2 Light Background - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Light%20Background.json
+- iTerm2 Pastel Dark Background - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Pastel%20Dark%20Background.json
+- iTerm2 Smoooooth - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Smoooooth.json
+- iTerm2 Solarized Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Solarized%20Dark.json
+- iTerm2 Solarized Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Solarized%20Light.json
+- iTerm2 Tango Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Tango%20Dark.json
+- iTerm2 Tango Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/iTerm2%20Tango%20Light.json
+- Jackie Brown - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Jackie%20Brown.json
+- Japanesque - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Japanesque.json
+- Jellybeans - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Jellybeans.json
+- JetBrains Darcula - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/JetBrains%20Darcula.json
+- JetBrains Islands Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/JetBrains%20Islands%20Dark.json
+- JetCalm Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/JetCalm%20Light.json
+- Jubi - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Jubi.json
+- Kanagawa Dragon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanagawa%20Dragon.json
+- Kanagawa Lotus - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanagawa%20Lotus.json
+- Kanagawa Wave - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanagawa%20Wave.json
+- Kanagawabones - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanagawabones.json
+- Kanso Ink - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanso%20Ink.json
+- Kanso Mist - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanso%20Mist.json
+- Kanso Pearl - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanso%20Pearl.json
+- Kanso Zen - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kanso%20Zen.json
+- Karasu Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karasu%20Night.json
+- Karasu Snow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karasu%20Snow.json
+- Karma Dark Dimmed - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Dark%20Dimmed.json
+- Karma Dark HC - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Dark%20HC.json
+- Karma Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Dark.json
+- Karma Light Dimmed - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Light%20Dimmed.json
+- Karma Light HC - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Light%20HC.json
+- Karma Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Karma%20Light.json
+- Keys Ocean Sunset HC - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Keys%20Ocean%20Sunset%20HC.json
+- Keys Ocean Sunset - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Keys%20Ocean%20Sunset.json
+- Kibble - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kibble.json
+- Kitty Default - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kitty%20Default.json
+- Kitty Low Contrast - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kitty%20Low%20Contrast.json
+- Klein Void - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Klein%20Void.json
+- Kolorit - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kolorit.json
+- Konsolas - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Konsolas.json
+- Kurokula - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Kurokula.json
+- Lab Fox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Lab%20Fox.json
+- Laser - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Laser.json
+- Later This Evening - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Later%20This%20Evening.json
+- Lavandula - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Lavandula.json
+- Letterpress - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Letterpress.json
+- Light Owl - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Light%20Owl.json
+- Liquid Carbon Transparent - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Liquid%20Carbon%20Transparent.json
+- Liquid Carbon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Liquid%20Carbon.json
+- London Bonfire Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/London%20Bonfire%20Night.json
+- London Columbia Road - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/London%20Columbia%20Road.json
+- London Embankment Dusk - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/London%20Embankment%20Dusk.json
+- London Soho Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/London%20Soho%20Night.json
+- Lovelace - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Lovelace.json
+- Man Page - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Man%20Page.json
+- Mariana - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mariana.json
+- Matcha Zen - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Matcha%20Zen.json
+- Material Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Material%20Dark.json
+- Material Darker - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Material%20Darker.json
+- Material Design Colors - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Material%20Design%20Colors.json
+- Material Ocean - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Material%20Ocean.json
+- Material - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Material.json
+- Mathias - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mathias.json
+- Matrix - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Matrix.json
+- Matte Black - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Matte%20Black.json
+- Medallion - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Medallion.json
+- Melange Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Melange%20Dark.json
+- Melange Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Melange%20Light.json
+- Mellifluous - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mellifluous.json
+- Mellow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mellow.json
+- Mesila One - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mesila%20One.json
+- Miami Heat - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Miami%20Heat.json
+- Miasma - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Miasma.json
+- Midnight Arcade - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Midnight%20Arcade.json
+- Midnight In Mojave - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Midnight%20In%20Mojave.json
+- Mirage - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mirage.json
+- Misterioso - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Misterioso.json
+- Modus Operandi Deuteranopia - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Operandi%20Deuteranopia.json
+- Modus Operandi Tinted - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Operandi%20Tinted.json
+- Modus Operandi Tritanopia - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Operandi%20Tritanopia.json
+- Modus Operandi - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Operandi.json
+- Modus Vivendi Deuteranopia - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Vivendi%20Deuteranopia.json
+- Modus Vivendi Tinted - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Vivendi%20Tinted.json
+- Modus Vivendi Tritanopia - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Vivendi%20Tritanopia.json
+- Modus Vivendi - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Modus%20Vivendi.json
+- Molokai - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Molokai.json
+- Mona Lisa - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Mona%20Lisa.json
+- Monokai Classic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Classic.json
+- Monokai Pro Light Sun - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Light%20Sun.json
+- Monokai Pro Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Light.json
+- Monokai Pro Machine - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Machine.json
+- Monokai Pro Octagon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Octagon.json
+- Monokai Pro Ristretto - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Ristretto.json
+- Monokai Pro Spectrum - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro%20Spectrum.json
+- Monokai Pro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Pro.json
+- Monokai Remastered - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Remastered.json
+- Monokai Soda - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Soda.json
+- Monokai SublimeText - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20SublimeText.json
+- Monokai Vivid - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monokai%20Vivid.json
+- Monospace Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monospace%20Dark.json
+- Monospace Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Monospace%20Light.json
+- Moonfly - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Moonfly.json
+- Moonwalk - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Moonwalk.json
+- N0Tch2K - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/N0Tch2K.json
+- Nachtschicht - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nachtschicht.json
+- Nebula Drift - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nebula%20Drift.json
+- Neobones Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neobones%20Dark.json
+- Neobones Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neobones%20Light.json
+- Neon Purple - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neon%20Purple.json
+- Neon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neon.json
+- Neopolitan - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neopolitan.json
+- Neutron - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Neutron.json
+- Night Lion V1 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Night%20Lion%20V1.json
+- Night Lion V2 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Night%20Lion%20V2.json
+- Night Owl - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Night%20Owl.json
+- Night Owlish Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Night%20Owlish%20Light.json
+- Nightfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nightfox.json
+- Niji - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Niji.json
+- No Clown Fiesta Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/No%20Clown%20Fiesta%20Light.json
+- No Clown Fiesta - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/No%20Clown%20Fiesta.json
+- Noctis Azureus - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Azureus.json
+- Noctis Bordo - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Bordo.json
+- Noctis Hibernus - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Hibernus.json
+- Noctis Lilac - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Lilac.json
+- Noctis Lux - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Lux.json
+- Noctis Minimus - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Minimus.json
+- Noctis Obscuro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Obscuro.json
+- Noctis Sereno - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Sereno.json
+- Noctis Uva - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Uva.json
+- Noctis Viola - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis%20Viola.json
+- Noctis - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Noctis.json
+- Nocturnal Winter - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nocturnal%20Winter.json
+- Nord Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nord%20Light.json
+- Nord Wave - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nord%20Wave.json
+- Nord - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nord.json
+- Nordfox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nordfox.json
+- Novel - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Novel.json
+- novmbr - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/novmbr.json
+- Nvim Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nvim%20Dark.json
+- Nvim Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Nvim%20Light.json
+- Obsidian - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Obsidian.json
+- Ocean - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ocean.json
+- Oceanic Material - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Oceanic%20Material.json
+- Oceanic Next - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Oceanic%20Next.json
+- Ollie - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ollie.json
+- One Dark Two - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/One%20Dark%20Two.json
+- One Double Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/One%20Double%20Dark.json
+- One Double Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/One%20Double%20Light.json
+- One Half Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/One%20Half%20Dark.json
+- One Half Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/One%20Half%20Light.json
+- Onenord Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Onenord%20Light.json
+- Onenord - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Onenord.json
+- Opaline - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Opaline.json
+- Operator Mono Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Operator%20Mono%20Dark.json
+- Outrun Electric - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Outrun%20Electric.json
+- Overnight Slumber - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Overnight%20Slumber.json
+- owl - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/owl.json
+- Oxblood - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Oxblood.json
+- Oxide - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Oxide.json
+- Oxocarbon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Oxocarbon.json
+- Pale Night Hc - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pale%20Night%20Hc.json
+- Pandora - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pandora.json
+- Paraiso Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Paraiso%20Dark.json
+- Patina Dark Soft - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Dark%20Soft.json
+- Patina Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Dark.json
+- Patina Lichen - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Lichen.json
+- Patina Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Light.json
+- Patina Moss - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Moss.json
+- Patina Stellar - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina%20Stellar.json
+- Patina - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Patina.json
+- Paul Millr - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Paul%20Millr.json
+- Pencil Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pencil%20Dark.json
+- Pencil Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pencil%20Light.json
+- Peppermint - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Peppermint.json
+- Phala Green Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Phala%20Green%20Dark.json
+- Piatto Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Piatto%20Light.json
+- Pierre Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pierre%20Dark.json
+- Pierre Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pierre%20Light.json
+- Pnevma - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pnevma.json
+- Poimandres Darker - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Poimandres%20Darker.json
+- Poimandres Storm - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Poimandres%20Storm.json
+- Poimandres White - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Poimandres%20White.json
+- Poimandres - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Poimandres.json
+- Popping And Locking - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Popping%20And%20Locking.json
+- Porcelain - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Porcelain.json
+- Powershell - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Powershell.json
+- Primary - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Primary.json
+- Prism - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Prism.json
+- Pro Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pro%20Light.json
+- Pro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pro.json
+- Purple Portal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Purple%20Portal.json
+- Purple Rain - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Purple%20Rain.json
+- Purplepeter - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Purplepeter.json
+- Pyrokai Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pyrokai%20Light.json
+- Pyrokai - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Pyrokai.json
+- Rapture - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rapture.json
+- Raycast Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Raycast%20Dark.json
+- Raycast Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Raycast%20Light.json
+- Rebecca - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rebecca.json
+- Red Alert - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Red%20Alert.json
+- Red Planet - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Red%20Planet.json
+- Red Sands - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Red%20Sands.json
+- Relaxed - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Relaxed.json
+- Retro Legends - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Retro%20Legends.json
+- Retro - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Retro.json
+- Rippedcasts - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rippedcasts.json
+- Rose Pine Dawn - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rose%20Pine%20Dawn.json
+- Rose Pine Moon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rose%20Pine%20Moon.json
+- Rose Pine - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rose%20Pine.json
+- Rouge 2 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Rouge%202.json
+- Royal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Royal.json
+- Ryuuko - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ryuuko.json
+- Sakura - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sakura.json
+- Sandstone Classic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sandstone%20Classic.json
+- Sandstone Ink - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sandstone%20Ink.json
+- Sandstone Warm - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sandstone%20Warm.json
+- Sauber - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sauber.json
+- Scarlet Protocol - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Scarlet%20Protocol.json
+- Sea Shells - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sea%20Shells.json
+- Seafoam Pastel - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Seafoam%20Pastel.json
+- SeedFlip Abyss - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Abyss.json
+- SeedFlip Amethyst - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Amethyst.json
+- SeedFlip Canopy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Canopy.json
+- SeedFlip Carbon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Carbon.json
+- SeedFlip Coral - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Coral.json
+- SeedFlip Ember - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Ember.json
+- SeedFlip Glacier - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Glacier.json
+- SeedFlip Inkwell - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Inkwell.json
+- SeedFlip Ivory - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Ivory.json
+- SeedFlip Nightfall - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Nightfall.json
+- SeedFlip Phosphor - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Phosphor.json
+- SeedFlip Pulse - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Pulse.json
+- SeedFlip Ultraviolet - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Ultraviolet.json
+- SeedFlip Voltage - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Voltage.json
+- SeedFlip Wavelength - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/SeedFlip%20Wavelength.json
+- Selenized Black - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Selenized%20Black.json
+- Selenized Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Selenized%20Dark.json
+- Selenized Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Selenized%20Light.json
+- Seoulbones Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Seoulbones%20Dark.json
+- Seoulbones Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Seoulbones%20Light.json
+- Sequoia Monochrome Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Monochrome%20Dark.json
+- Sequoia Monochrome Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Monochrome%20Light.json
+- Sequoia Moonlight Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Moonlight%20Dark.json
+- Sequoia Moonlight Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Moonlight%20Light.json
+- Sequoia Retro Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Retro%20Dark.json
+- Sequoia Retro Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sequoia%20Retro%20Light.json
+- Serendipity Midnight - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Serendipity%20Midnight.json
+- Serendipity Morning - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Serendipity%20Morning.json
+- Serendipity Sunset - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Serendipity%20Sunset.json
+- Seti - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Seti.json
+- Shades Of Purple - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Shades%20Of%20Purple.json
+- Shaman - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Shaman.json
+- Shokunin - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Shokunin.json
+- Slate - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Slate.json
+- Sleepy Hollow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sleepy%20Hollow.json
+- Smyck - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Smyck.json
+- Snazzy Soft - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Snazzy%20Soft.json
+- Snazzy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Snazzy.json
+- Soft Server - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Soft%20Server.json
+- Solarized Darcula - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Solarized%20Darcula.json
+- Solarized Dark Higher Contrast - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Solarized%20Dark%20Higher%20Contrast.json
+- Solarized Dark Patched - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Solarized%20Dark%20Patched.json
+- Solarized Osaka Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Solarized%20Osaka%20Night.json
+- Sonokai - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sonokai.json
+- Spacedust - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spacedust.json
+- Spacegray Bright - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spacegray%20Bright.json
+- Spacegray Eighties Dull - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spacegray%20Eighties%20Dull.json
+- Spacegray Eighties - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spacegray%20Eighties.json
+- Spacegray - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spacegray.json
+- Spiderman - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spiderman.json
+- Spring - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Spring.json
+- Square - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Square.json
+- Squintless - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Squintless.json
+- Squirrelsong Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Squirrelsong%20Dark.json
+- Srcery - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Srcery.json
+- Starlight - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Starlight.json
+- Sublette - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sublette.json
+- Subliminal - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Subliminal.json
+- Sugarplum - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sugarplum.json
+- Sumi Linen - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sumi%20Linen.json
+- Sumi Phosphor - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sumi%20Phosphor.json
+- Sundried - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sundried.json
+- Sunset Drive - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Sunset%20Drive.json
+- Symfonic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Symfonic.json
+- Synthwave Alpha - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Synthwave%20Alpha.json
+- Synthwave Everything - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Synthwave%20Everything.json
+- Synthwave - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Synthwave.json
+- Tango Adapted - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tango%20Adapted.json
+- Tango Half Adapted - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tango%20Half%20Adapted.json
+- Tearout - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tearout.json
+- Teerb - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Teerb.json
+- Terafox - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Terafox.json
+- Terminal Basic Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Terminal%20Basic%20Dark.json
+- Terminal Basic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Terminal%20Basic.json
+- Terminal Green 1999 - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Terminal%20Green%201999.json
+- Thayer Bright - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Thayer%20Bright.json
+- The Hulk - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/The%20Hulk.json
+- Tinacious Design Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tinacious%20Design%20Dark.json
+- Tinacious Design Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tinacious%20Design%20Light.json
+- Token Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Token%20Dark.json
+- Token Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Token%20Light.json
+- TokyoNight Day - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/TokyoNight%20Day.json
+- TokyoNight Moon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/TokyoNight%20Moon.json
+- TokyoNight Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/TokyoNight%20Night.json
+- TokyoNight Storm - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/TokyoNight%20Storm.json
+- TokyoNight - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/TokyoNight.json
+- Tomorrow Night Blue - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow%20Night%20Blue.json
+- Tomorrow Night Bright - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow%20Night%20Bright.json
+- Tomorrow Night Burns - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow%20Night%20Burns.json
+- Tomorrow Night Eighties - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow%20Night%20Eighties.json
+- Tomorrow Night - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow%20Night.json
+- Tomorrow - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Tomorrow.json
+- Toy Chest - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Toy%20Chest.json
+- traffic - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/traffic.json
+- Trapped in Amber - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Trapped%20in%20Amber.json
+- Treehouse - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Treehouse.json
+- Twilight - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Twilight.json
+- Ubuntu - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ubuntu.json
+- Ultra Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ultra%20Dark.json
+- Ultra Violent - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Ultra%20Violent.json
+- Under The Sea - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Under%20The%20Sea.json
+- Unikitty - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Unikitty.json
+- urban - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/urban.json
+- Urple - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Urple.json
+- Vague - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vague.json
+- Vaporwave Sunset - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vaporwave%20Sunset.json
+- Vaughn - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vaughn.json
+- Velvet Court - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Velvet%20Court.json
+- Vercel - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vercel.json
+- Verdigris - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Verdigris.json
+- Vesper - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vesper.json
+- Vibrant Ink - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vibrant%20Ink.json
+- Vimbones - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Vimbones.json
+- Violet Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Violet%20Dark.json
+- Violet Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Violet%20Light.json
+- Violite - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Violite.json
+- Warm Burnout Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Warm%20Burnout%20Dark.json
+- Warm Burnout Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Warm%20Burnout%20Light.json
+- Warm Neon - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Warm%20Neon.json
+- Wez - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Wez.json
+- Whimsy - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Whimsy.json
+- Wild Cherry - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Wild%20Cherry.json
+- Wilmersdorf - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Wilmersdorf.json
+- Wombat - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Wombat.json
+- Wryan - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Wryan.json
+- Xcode Dark hc - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Xcode%20Dark%20hc.json
+- Xcode Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Xcode%20Dark.json
+- Xcode Light hc - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Xcode%20Light%20hc.json
+- Xcode Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Xcode%20Light.json
+- Xcode WWDC - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Xcode%20WWDC.json
+- Y2K Chrome - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Y2K%20Chrome.json
+- Zenbones Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenbones%20Dark.json
+- Zenbones Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenbones%20Light.json
+- Zenbones - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenbones.json
+- Zenburn - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenburn.json
+- Zenburned - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenburned.json
+- Zenwritten Dark - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenwritten%20Dark.json
+- Zenwritten Light - https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/windowsterminal/Zenwritten%20Light.json
+
+---
+
+## Fastfetch built-in logos
+
+From `fastfetch --list-logos`. Use one of these names as `"logo": { "type": "builtin", "source": "<name>" }`.
+
+### Windows names
+
+- `Windows Server 2025`
+- `Windows 11`
+- `Windows Server 2022`
+- `Windows 11_small`
+- `Windows 8`
+- `Windows 8.1`
+- `Windows 10`
+- `Windows Server 2012`
+- `Windows Server 2012 R2`
+- `Windows Server 2016`
+- `Windows Server 2019`
+- `Windows`
+- `Windows 7`
+- `Windows Server 2008`
+- `Windows Server 2008 R2`
+- `Windows 95`
+- `Windows 9x`
+
+### All names
+
+- `Adelie`
+- `Aeon`
+- `aerOS`
+- `AerynOS`
+- `AerynOS_old`
+- `Afterglow`
+- `aix`
+- `Almalinux`
+- `Alpine`
+- `Alpine_small`
+- `Alpine2`
+- `alpine2_small`
+- `alpine3_small`
+- `Alter`
+- `ALTLinux`
+- `Amazon`
+- `Amazon Linux`
+- `Amiga`
+- `AmogOS`
+- `amzn`
+- `Anarchy`
+- `android`
+- `android_small`
+- `anduinos`
+- `Antergos`
+- `antiX`
+- `AnushOS`
+- `Aosc OS`
+- `Aosc OS/Retro`
+- `Aosc OS/Retro_small`
+- `Aosc OS_old`
+- `aoscos`
+- `aoscos_old`
+- `aoscosretro`
+- `aoscosretro_small`
+- `Aperture`
+- `Apple`
+- `Apple_small`
+- `Apricity`
+- `arch`
+- `arch_old`
+- `arch_small`
+- `arch2`
+- `arch3`
+- `ArchBox`
+- `Archcraft`
+- `Archcraft2`
+- `ARCHlabs`
+- `archmerge`
+- `ArchStrike`
+- `arco`
+- `arco_small`
+- `arcolinux`
+- `arcolinux_small`
+- `Arkane`
+- `Arkane Linux`
+- `Armbian`
+- `Armbian2`
+- `arse`
+- `arselinux`
+- `arse-linux`
+- `artix`
+- `artix_small`
+- `artix2_small`
+- `Arya`
+- `asahi`
+- `asahi2`
+- `asahi-linux`
+- `asahi-linux2`
+- `aster`
+- `AsteroidOS`
+- `astOS`
+- `Astra`
+- `Astra Linux`
+- `astralinux`
+- `Ataraxia`
+- `AthenaOS`
+- `AthenaOS_old`
+- `Aurora`
+- `AxOS`
+- `Azos`
+- `AzureLinux`
+- `AzureLinux2`
+- `bedrock`
+- `bedrock_small`
+- `BerserkArch`
+- `BigLinux`
+- `Bitrig`
+- `Blackarch`
+- `BlackMesa`
+- `black-mesa`
+- `BlackPanther`
+- `BLAG`
+- `BlankOn`
+- `BlueLight`
+- `Bodhi`
+- `Bonsai`
+- `Bredos`
+- `BSD`
+- `BunsenLabs`
+- `CachyOS`
+- `CachyOS_old_small`
+- `CachyOS_small`
+- `Calculate`
+- `CalinixOS`
+- `CalinixOS_small`
+- `Carbs`
+- `CBL-Mariner`
+- `CelOS`
+- `Center`
+- `CentOS`
+- `CentOS_small`
+- `Cereus`
+- `Chakra`
+- `ChaletOS`
+- `Chapeau`
+- `Chimera`
+- `Chimera_small`
+- `Chimera2`
+- `ChonkySealOS`
+- `Chrom`
+- `ChromeOS`
+- `Cleanjaro`
+- `Cleanjaro_small`
+- `Clear Linux`
+- `Clear Linux OS`
+- `clearlinux`
+- `ClearOS`
+- `Clover`
+- `Cobalt`
+- `Codex Linux`
+- `common-torizon`
+- `Condres`
+- `Container Linux by CoreOS`
+- `CoreOS`
+- `Cosmic`
+- `CRUX`
+- `CRUX_small`
+- `Crystal`
+- `Crystal-Linux`
+- `Cucumber`
+- `CucumberOS`
+- `CuerdOS`
+- `CuerdOS GNU/Linux`
+- `CutefishOS`
+- `CuteOS`
+- `CyberOS`
+- `cycledream`
+- `dahliaOS`
+- `DarkOS`
+- `Debian`
+- `Debian_small`
+- `Deepin`
+- `DesaOS`
+- `Devuan`
+- `Devuan_small`
+- `DietPi`
+- `DracOS`
+- `DragonFly`
+- `DragonFly_old`
+- `DragonFly_small`
+- `Drauger`
+- `DraugerOS`
+- `Droidian`
+- `elbrus`
+- `Elementary`
+- `Elementary_small`
+- `Elive`
+- `Emmabuntus`
+- `EncryptOS`
+- `EndeavourOS`
+- `EndeavourOS_small`
+- `Endless`
+- `ENOS`
+- `Enso`
+- `EshanizedOS`
+- `EuroLinux`
+- `EvolutionOS`
+- `EvolutionOS_old`
+- `EvolutionOS_small`
+- `eweOS`
+- `Exherbo`
+- `Exodia`
+- `Fastfetch`
+- `Fedora`
+- `Fedora_old`
+- `Fedora_small`
+- `Fedora2_small`
+- `fedora-asahi-remix`
+- `Fedora-CoreOS`
+- `Fedora-Kinoite`
+- `Fedora-Sericea`
+- `Fedora-Silverblue`
+- `FemboyOS`
+- `Feren`
+- `FF`
+- `Filotimo`
+- `Finnix`
+- `Flatcar`
+- `Floflis`
+- `Freebsd`
+- `freebsd_small`
+- `FreeMiNT`
+- `Frugalware`
+- `frugalware-linux`
+- `Funtoo`
+- `GalliumOS`
+- `Garuda`
+- `Garuda_small`
+- `GarudaDragon`
+- `garuda-dragon`
+- `garuda-linux_small`
+- `Gentoo`
+- `Gentoo_small`
+- `GhostBSD`
+- `GhostFreak`
+- `Glaucus`
+- `gNewSense`
+- `GNOME OS`
+- `GNU`
+- `Gobo`
+- `GoboLinux`
+- `GoldenDogLinux`
+- `GrapheneOS`
+- `Grombyang`
+- `Guix`
+- `Guix_small`
+- `GXDE`
+- `Haiku`
+- `Haiku_small`
+- `Haiku2`
+- `HamoniKR`
+- `HarDClanZ`
+- `HardenedBSD`
+- `HarmonyOS`
+- `Hash`
+- `hce`
+- `HeliumOS`
+- `Huawei Cloud EulerOS`
+- `Huayra`
+- `Hybrid`
+- `HydroOS`
+- `Hyperbola`
+- `Hyperbola_small`
+- `Iglu`
+- `Iglunix`
+- `InstantOS`
+- `Interix`
+- `IRIX`
+- `Ironclad`
+- `Itc`
+- `januslinux`
+- `Kaisen`
+- `Kali`
+- `Kali_small`
+- `kalpa-desktop`
+- `KaOS`
+- `KDE Neon`
+- `kdelinux`
+- `kde-linux`
+- `kde-ubuntu`
+- `KernelOS`
+- `KibaOS`
+- `Kibojoe`
+- `KISS`
+- `kiss2`
+- `Kogaion`
+- `Korora`
+- `Krass`
+- `KrassOS`
+- `KSLinux`
+- `Kubuntu`
+- `kubuntu-linux`
+- `Kylin`
+- `l7`
+- `LainOS`
+- `langitketujuh`
+- `Laxeros`
+- `LEDE`
+- `lfs`
+- `LibreELEC`
+- `Lilidog`
+- `LimeOS`
+- `Lindows`
+- `Lingmo`
+- `LingmoOS`
+- `Linspire`
+- `Linux`
+- `Linux_small`
+- `LinuxFromScratch`
+- `linux-generic`
+- `linux-generic_small`
+- `LinuxLite`
+- `LinuxLite_small`
+- `linuxmint`
+- `linuxmint_old`
+- `linuxmint_small`
+- `linuxmint2`
+- `linuxmint2_small`
+- `Live Raizo`
+- `Live_Raizo`
+- `LliureX`
+- `LMDE`
+- `locos`
+- `loc-os`
+- `Loc-OS Linux`
+- `lubuntu`
+- `Lunar`
+- `Macaroni`
+- `macOS`
+- `macOS_small`
+- `macOS2`
+- `macOS2_small`
+- `macOS3`
+- `Mageia`
+- `Mageia_small`
+- `MainsailOS`
+- `MainsailOS_small`
+- `mandrake`
+- `mandriva`
+- `manjaro`
+- `manjaro_small`
+- `manjaro-arm`
+- `manjaro-arm_small`
+- `MassOS`
+- `Matuus`
+- `MatuusOS`
+- `MaUI`
+- `Mauna`
+- `Meowix`
+- `Mer`
+- `MidnightBSD`
+- `MidOS`
+- `MidOS_old`
+- `Minimal_System`
+- `Minix`
+- `miraclelinux`
+- `MOS`
+- `Msys2`
+- `MX`
+- `MX_small`
+- `MX2`
+- `Namib`
+- `NebiOS`
+- `Nekos`
+- `Neptune`
+- `NetBSD`
+- `NetBSD_small`
+- `NetBSD2`
+- `NetHydra`
+- `NetRunner`
+- `nexalinux`
+- `Nitrux`
+- `NixOS`
+- `nixos_old`
+- `nixos_old_small`
+- `NixOS_small`
+- `NixOS2`
+- `nobara`
+- `nomadbsd`
+- `NurOS`
+- `Nurunner`
+- `NuTyX`
+- `Obarun`
+- `OBRevenge`
+- `ObsidianOS`
+- `ol`
+- `OmniOS`
+- `Open Source Media Center`
+- `openbsd`
+- `openbsd_small`
+- `OpenEuler`
+- `OpenIndiana`
+- `openKylin`
+- `OpenMamba`
+- `OpenMandriva`
+- `openRuyi`
+- `OpenStage`
+- `opensuse`
+- `opensuse_small`
+- `opensuse-leap`
+- `opensuse-leap_old`
+- `opensuse-microos`
+- `opensuse-slowroll`
+- `opensuse-tumbleweed`
+- `opensuse-tumbleweed_old`
+- `opensuse-tumbleweed_small`
+- `opensuse-tumbleweed2`
+- `opensuse-tumbleweed-slowroll`
+- `openwrt`
+- `openwrt_old`
+- `openwrt_small`
+- `OPNsense`
+- `oracle`
+- `orchid`
+- `orchid_small`
+- `Oreon`
+- `Origami`
+- `Origami_small`
+- `OS Elbrus`
+- `OS2Warp`
+- `OSMC`
+- `OSX`
+- `OSX_small`
+- `PacBSD`
+- `Panwah`
+- `Parabola`
+- `Parabola_small`
+- `Parabola2_small`
+- `Parch`
+- `Pardus`
+- `Parrot`
+- `Parsix`
+- `PCBSD`
+- `PCLinuxOS`
+- `PearOS`
+- `Pengwin`
+- `Pentoo`
+- `Peppermint`
+- `Peropesis`
+- `PhyOS`
+- `PikaOS`
+- `PisiLinux`
+- `PNM Linux`
+- `pop`
+- `pop_small`
+- `popos`
+- `popos_small`
+- `Porteus`
+- `PostMarketOS`
+- `PostMarketOS_small`
+- `PostMarketOS2`
+- `PrismLinux`
+- `PrismLinux_small`
+- `Proxmox`
+- `PuffOS`
+- `Puppy`
+- `PureOS`
+- `PureOS_small`
+- `Q4OS`
+- `qts`
+- `Quasar`
+- `Qubes`
+- `Qubes_small`
+- `Qubyt`
+- `Quibian`
+- `Quirinux`
+- `Radix`
+- `raspbian`
+- `raspbian_small`
+- `RavynOS`
+- `RebornOS`
+- `RebornOS_small`
+- `RedCore`
+- `redhat`
+- `redhat_old`
+- `redhat_small`
+- `RedOS`
+- `RedOS_small`
+- `Redrose`
+- `Redstar`
+- `Refracta`
+- `Regata`
+- `Regolith`
+- `RengeOS`
+- `RhaymOS`
+- `rhel`
+- `rhel_old`
+- `rhel_small`
+- `Rhino Linux`
+- `rocky`
+- `rocky_small`
+- `ROSA`
+- `Sabayon`
+- `Sabotage`
+- `Sailfish`
+- `SalentOS`
+- `Salient OS`
+- `SalientOS`
+- `Salix`
+- `SambaBOX`
+- `Sasanqua`
+- `Scientific`
+- `secureblue`
+- `semc`
+- `Septor`
+- `Serene`
+- `Serpent OS`
+- `SharkLinux`
+- `ShastraOS`
+- `Shebang`
+- `Siduction`
+- `SkiffOS`
+- `Slackel`
+- `Slackware`
+- `Slackware_small`
+- `SleeperOS`
+- `SleeperOS_small`
+- `Slitaz`
+- `SmartOS`
+- `Snigdha`
+- `SnigdhaOS`
+- `Soda`
+- `solaris`
+- `solaris_small`
+- `Solus`
+- `solus-linux`
+- `Source Mage`
+- `Source Mage GNU/Linux`
+- `source_mage`
+- `sourcemage`
+- `Sparky`
+- `SpoinkOS`
+- `spoink-os`
+- `Star`
+- `SteamDeck`
+- `SteamDeck_small`
+- `SteamDeckOled`
+- `SteamOS`
+- `Stock Linux`
+- `Sulin`
+- `SummitOS`
+- `sunos`
+- `sunos_small`
+- `suse`
+- `suse_small`
+- `suse-linux`
+- `suse-linux_small`
+- `Swagarch`
+- `T2`
+- `T2 SDE`
+- `T2 SDE_small`
+- `T2/Linux`
+- `T2/Linux_small`
+- `T2_small`
+- `Tails`
+- `Tatra`
+- `TeArch`
+- `TempleOS`
+- `TileOS`
+- `Torizon OS`
+- `TorizonCore`
+- `Trisquel`
+- `TrueNAS-Scale`
+- `TrueOS`
+- `Turkish`
+- `tuxedo`
+- `Tuxedo OS`
+- `Twister`
+- `UBLinux`
+- `UBLinux_small`
+- `ubuntu`
+- `ubuntu budgie`
+- `ubuntu cinnamon`
+- `ubuntu gnome`
+- `ubuntu kylin`
+- `ubuntu mate`
+- `ubuntu studio`
+- `ubuntu sway`
+- `ubuntu touch`
+- `ubuntu unity`
+- `ubuntu_old`
+- `ubuntu_old2`
+- `ubuntu_old2_small`
+- `ubuntu_small`
+- `ubuntu-budgie`
+- `ubuntu-cinnamon`
+- `ubuntu-gnome`
+- `ubuntu-kylin`
+- `ubuntu-mate`
+- `ubuntu-studio`
+- `ubuntu-sway`
+- `ubuntu-touch`
+- `ubuntu-unity`
+- `Ultramarine`
+- `Ultramarine_small`
+- `Unifi`
+- `Univalent`
+- `Univention`
+- `UOS`
+- `UrukOS`
+- `uwuntu`
+- `Uzbek`
+- `Valhalla`
+- `valhalla-linux`
+- `valhallaos`
+- `vanilla`
+- `vanilla_small`
+- `vanilla2`
+- `Venom`
+- `Venom_small`
+- `VincentOS`
+- `Vnux`
+- `void`
+- `void_small`
+- `void2`
+- `void2_small`
+- `Vzlinux`
+- `Wii Linux`
+- `WiiLinux`
+- `Wii-Linux`
+- `WiiLinuxNgx`
+- `Windows`
+- `Windows 10`
+- `Windows 11`
+- `Windows 11_small`
+- `Windows 7`
+- `Windows 8`
+- `Windows 8.1`
+- `Windows 95`
+- `Windows 9x`
+- `Windows Server 2008`
+- `Windows Server 2008 R2`
+- `Windows Server 2012`
+- `Windows Server 2012 R2`
+- `Windows Server 2016`
+- `Windows Server 2019`
+- `Windows Server 2022`
+- `Windows Server 2025`
+- `WolfOS`
+- `XCP-ng`
+- `xenenterprise`
+- `Xenia`
+- `Xenia_old`
+- `XeroArch`
+- `Xferience`
+- `Ximper`
+- `Xinux`
+- `XJ380`
+- `Xray_OS`
+- `Xubuntu`
+- `YiffOS`
+- `z/OS`
+- `Zerene`
+- `Zorin`
+- `zos`
+- `Zraxyl`
