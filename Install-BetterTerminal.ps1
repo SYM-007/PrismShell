@@ -1599,7 +1599,8 @@ function Update-StudioPreview {
     }
 
     if ($ui.Picks) {
-        $ui.Picks.Text = "Selected:  $($Theme.name)   |   $(if ($Font) { $Font.Label } else { 'font' })   |   $(if ($Art) { $Art.Label } else { 'art' })   |   $(if ($Posh) { $Posh.Label } else { 'prompt' })   |   $Opacity%"
+        $prefix = if ($script:RestoredLastLook) { 'Last look:' } else { 'Selected:' }
+        $ui.Picks.Text = "$prefix  $($Theme.name)   |   $(if ($Font) { $Font.Label } else { 'font' })   |   $(if ($Art) { $Art.Label } else { 'art' })   |   $(if ($Posh) { $Posh.Label } else { 'prompt' })   |   $Opacity%"
     }
 
     Update-WindowsTerminalLivePreview -Theme $Theme -Font $Font -Opacity $Opacity
@@ -1805,8 +1806,12 @@ function Show-ChoiceStudio {
 
     $header = New-Object System.Windows.Forms.Label
     $header.Dock = 'Top'
-    $header.Height = 36
-    $header.Text = "  Everything is already downloaded. $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts. Search clears when you change tabs."
+    $header.Height = 52
+    if ($script:RestoredLastLook) {
+        $header.Text = "  Your last look is already selected. Change only the tab you want, then Use this look.`r`n  $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts. Search clears when you change tabs."
+    } else {
+        $header.Text = "  Everything is already downloaded. $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts.`r`n  Search clears when you change tabs."
+    }
     $header.TextAlign = 'MiddleLeft'
     $header.BackColor = [System.Drawing.Color]::FromArgb(36, 38, 52)
     $header.Font = New-Object System.Drawing.Font('Segoe UI', 11)
@@ -2190,10 +2195,10 @@ function Show-ChoiceStudio {
         $script:StudioForm.Activate()
         $script:StudioForm.BringToFront()
         Update-GlassTickLabels
-        if ($script:ThemeGrid.Rows.Count -gt 0) { $script:ThemeGrid.Rows[0].Selected = $true }
-        if ($script:FontGrid.Rows.Count -gt 0) { $script:FontGrid.Rows[0].Selected = $true }
-        if ($script:ArtGrid.Rows.Count -gt 0) { $script:ArtGrid.Rows[0].Selected = $true }
-        if ($script:PoshGrid.Rows.Count -gt 0) { $script:PoshGrid.Rows[0].Selected = $true }
+        Select-StudioGridRow -Grid $script:ThemeGrid -Wanted $script:StudioPlan.Theme -Properties @('name')
+        Select-StudioGridRow -Grid $script:FontGrid -Wanted $script:StudioPlan.Font -Properties @('Id', 'Label')
+        Select-StudioGridRow -Grid $script:ArtGrid -Wanted $script:StudioPlan.Art -Properties @('Id', 'Label')
+        Select-StudioGridRow -Grid $script:PoshGrid -Wanted $script:StudioPlan.Posh -Properties @('Id', 'Label')
         Update-StudioPreview
     })
 
@@ -3006,12 +3011,232 @@ function Get-FastfetchFullPreview {
 
 function Get-PreferredCatalogItem {
     param($Items, [string[]]$Names, [string]$Property = 'name')
-    foreach ($want in $Names) {
+    $hit = Find-CatalogItem -Items $Items -Names $Names -Property $Property
+    if ($hit) { return $hit }
+    if ($Items -and $Items.Count -gt 0) { return $Items[0] }
+    return $null
+}
+
+function Find-CatalogItem {
+    param($Items, [string[]]$Names, [string]$Property = 'name')
+    if (-not $Items) { return $null }
+    foreach ($want in @($Names)) {
+        if ([string]::IsNullOrWhiteSpace($want)) { continue }
         $hit = @($Items | Where-Object { [string]$_.$Property -eq $want } | Select-Object -First 1)
         if ($hit.Count -gt 0 -and $hit[0]) { return $hit[0] }
     }
-    if ($Items -and $Items.Count -gt 0) { return $Items[0] }
     return $null
+}
+
+function Get-LastLookPath {
+    Join-Path (Get-CatalogRoot) 'last-look.json'
+}
+
+function Get-LastLookFromInstalledSettings {
+    $look = [pscustomobject]@{
+        Theme      = $null
+        Font       = $null
+        FontLabel  = $null
+        Art        = $null
+        ArtId      = $null
+        Posh       = $null
+        Opacity    = $null
+        UseAcrylic = $null
+    }
+
+    $wt = Get-WindowsTerminalSettingsPath
+    if ($wt -and (Test-Path $wt)) {
+        try {
+            $settings = ConvertFrom-Jsonc (Get-Content -Path $wt -Raw -Encoding UTF8)
+            $defaults = $null
+            if ($settings.profiles -and $settings.profiles.defaults) {
+                $defaults = $settings.profiles.defaults
+            }
+            if ($defaults) {
+                if ($defaults.colorScheme) { $look.Theme = [string]$defaults.colorScheme }
+                if ($null -ne $defaults.opacity -and $defaults.opacity -ne '') {
+                    $look.Opacity = [int]$defaults.opacity
+                }
+                if ($null -ne $defaults.useAcrylic -and $defaults.useAcrylic -ne '') {
+                    $look.UseAcrylic = [bool]$defaults.useAcrylic
+                }
+                if ($defaults.font -and $defaults.font.face) {
+                    $look.FontLabel = [string]$defaults.font.face
+                }
+            }
+        } catch {}
+    }
+
+    $ff = Join-Path $env:USERPROFILE '.config\fastfetch\config.jsonc'
+    if (Test-Path $ff) {
+        try {
+            $cfg = ConvertFrom-Jsonc (Get-Content -Path $ff -Raw -Encoding UTF8)
+            if ($cfg.logo) {
+                $kind = [string]$cfg.logo.type
+                $source = [string]$cfg.logo.source
+                if ($kind -eq 'none') {
+                    $look.ArtId = 'none'
+                    $look.Art = 'No logo (info only)'
+                } elseif ($kind -eq 'auto' -or [string]::IsNullOrWhiteSpace($source)) {
+                    $look.ArtId = 'windows-auto'
+                    $look.Art = 'Auto (detect this PC)'
+                } elseif (-not [string]::IsNullOrWhiteSpace($source) -and $kind -ne 'file') {
+                    $look.Art = $source
+                }
+            }
+        } catch {}
+    }
+
+    foreach ($profilePath in @(Get-PowerShellProfilePaths)) {
+        if (-not $profilePath -or -not (Test-Path $profilePath)) { continue }
+        try {
+            $text = Get-Content -Path $profilePath -Raw -ErrorAction Stop
+        } catch { continue }
+        if ($text -match "oh-my-posh init[^\r\n]*--config\s+['""]([^'""]+)['""]") {
+            $base = [IO.Path]::GetFileNameWithoutExtension($Matches[1])
+            $look.Posh = $base -replace '\.omp$', ''
+            break
+        }
+    }
+
+    return $look
+}
+
+function Get-LastLookSnapshot {
+    $snap = Get-LastLookFromInstalledSettings
+    $path = Get-LastLookPath
+    if (-not (Test-Path $path)) { return $snap }
+    try {
+        $saved = Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json
+    } catch {
+        return $snap
+    }
+    if (-not $saved) { return $snap }
+    foreach ($key in @('Theme', 'Font', 'FontLabel', 'Art', 'ArtId', 'Posh', 'Opacity', 'UseAcrylic')) {
+        if (-not $saved.PSObject.Properties[$key]) { continue }
+        $value = $saved.$key
+        if ($null -eq $value) { continue }
+        if ($key -eq 'Opacity' -or $key -eq 'UseAcrylic') {
+            $snap.$key = $value
+            continue
+        }
+        if ([string]$value -ne '') { $snap.$key = $value }
+    }
+    return $snap
+}
+
+function Find-SavedFont {
+    param($Saved)
+    $items = @(Get-FontCatalog)
+    if (-not $Saved) { return $null }
+    $hit = Find-CatalogItem -Items $items -Names @($Saved.Font) -Property 'Id'
+    if ($hit) { return $hit }
+    $hit = Find-CatalogItem -Items $items -Names @($Saved.FontLabel, $Saved.Font) -Property 'Label'
+    if ($hit) { return $hit }
+    $hit = Find-CatalogItem -Items $items -Names @($Saved.FontLabel, $Saved.Font) -Property 'Face'
+    if ($hit) { return $hit }
+    $want = @()
+    if ($Saved.FontLabel) { $want += [string]$Saved.FontLabel }
+    if ($Saved.Font) { $want += [string]$Saved.Font }
+    foreach ($font in $items) {
+        $names = @()
+        if ($font.Guesses) { $names += @($font.Guesses) }
+        foreach ($name in $want) {
+            if ($names -contains $name) { return $font }
+        }
+    }
+    return $null
+}
+
+function Find-SavedArt {
+    param($Saved)
+    $items = @(Get-AsciiCatalog)
+    if (-not $Saved) { return $null }
+    $hit = Find-CatalogItem -Items $items -Names @($Saved.ArtId) -Property 'Id'
+    if ($hit) { return $hit }
+    $hit = Find-CatalogItem -Items $items -Names @($Saved.Art, $Saved.ArtId) -Property 'Label'
+    if ($hit) { return $hit }
+    return (Find-CatalogItem -Items $items -Names @($Saved.Art, $Saved.ArtId) -Property 'Source')
+}
+
+function Restore-LastLookToPlan {
+    param($Plan)
+    $script:RestoredLastLook = $false
+    $saved = Get-LastLookSnapshot
+    if (-not $saved) { return $false }
+
+    $theme = Find-CatalogItem -Items (Get-ThemeCatalog) -Names @($saved.Theme) -Property 'name'
+    if ($theme) { $Plan.Theme = $theme; $script:RestoredLastLook = $true }
+
+    $font = Find-SavedFont $saved
+    if ($font) { $Plan.Font = $font; $script:RestoredLastLook = $true }
+
+    $art = Find-SavedArt $saved
+    if ($art) { $Plan.Art = $art; $script:RestoredLastLook = $true }
+
+    $posh = Find-CatalogItem -Items (Get-PoshCatalog) -Names @($saved.Posh) -Property 'Id'
+    if (-not $posh) {
+        $posh = Find-CatalogItem -Items (Get-PoshCatalog) -Names @($saved.Posh) -Property 'Label'
+    }
+    if ($posh) { $Plan.Posh = $posh; $script:RestoredLastLook = $true }
+
+    if ($null -ne $saved.Opacity -and $saved.Opacity -ne '') {
+        $n = 80
+        try { $n = [int]$saved.Opacity } catch { $n = 80 }
+        $Plan.Opacity = [Math]::Min(100, [Math]::Max(0, $n))
+        $script:RestoredLastLook = $true
+    }
+    if ($null -ne $saved.UseAcrylic -and $saved.UseAcrylic -ne '') {
+        $Plan.UseAcrylic = [bool]$saved.UseAcrylic
+        $script:RestoredLastLook = $true
+    }
+    return [bool]$script:RestoredLastLook
+}
+
+function Save-LastLook {
+    param($Plan)
+    if (-not $Plan) { return }
+    $obj = [pscustomobject]@{
+        Theme      = if ($Plan.Theme) { [string]$Plan.Theme.name } else { '' }
+        Font       = if ($Plan.Font) { [string]$Plan.Font.Id } else { '' }
+        FontLabel  = if ($Plan.Font) { [string]$Plan.Font.Label } else { '' }
+        Art        = if ($Plan.Art) { [string]$Plan.Art.Label } else { '' }
+        ArtId      = if ($Plan.Art) { [string]$Plan.Art.Id } else { '' }
+        Posh       = if ($Plan.Posh) { [string]$Plan.Posh.Id } else { '' }
+        Opacity    = [int]$Plan.Opacity
+        UseAcrylic = [bool]$Plan.UseAcrylic
+        SavedAt    = (Get-Date).ToString('o')
+    }
+    try {
+        Write-Utf8NoBom -Path (Get-LastLookPath) -Text ($obj | ConvertTo-Json -Depth 4)
+    } catch {}
+}
+
+function Select-StudioGridRow {
+    param($Grid, $Wanted, [string[]]$Properties)
+    if (-not $Grid -or $Grid.Rows.Count -eq 0) { return }
+    $match = $null
+    if ($Wanted) {
+        foreach ($row in $Grid.Rows) {
+            if ($row.IsNewRow -or -not $row.Tag) { continue }
+            foreach ($prop in $Properties) {
+                $left = [string]$row.Tag.$prop
+                $right = [string]$Wanted.$prop
+                if ($left -and $right -and ($left -eq $right)) {
+                    $match = $row
+                    break
+                }
+            }
+            if ($match) { break }
+        }
+    }
+    if (-not $match) { $match = $Grid.Rows[0] }
+    try { $Grid.ClearSelection() } catch {}
+    $match.Selected = $true
+    if ($match.Cells.Count -gt 0) {
+        try { $Grid.CurrentCell = $match.Cells[0] } catch {}
+    }
+    try { $Grid.FirstDisplayedScrollingRowIndex = $match.Index } catch {}
 }
 
 function Invoke-DownloadEverything {
@@ -3614,6 +3839,18 @@ function Show-WelcomeScreen {
     Write-Color '  Type Y and press Enter to download all of it, then pick your look.' '#F9E2AF'
     Write-Color '  Type O if you want to say yes or no to each tool.' '#89B4FA'
     Write-Color '  Type Q to quit. Nothing will change.' '#F38BA8'
+    try {
+        $savedLook = $false
+        if (Test-Path (Get-LastLookPath)) { $savedLook = $true }
+        if (-not $savedLook) {
+            $snap = Get-LastLookFromInstalledSettings
+            $savedLook = [bool]($snap.Theme -or $snap.Posh -or $snap.Art -or $snap.FontLabel)
+        }
+        if ($savedLook) {
+            Write-Host ""
+            Write-Color '  Your last look will already be selected. Change only the one thing you want.' '#A6E3A1'
+        }
+    } catch {}
     Write-Host ""
 }
 
@@ -3962,6 +4199,7 @@ function Invoke-ApplyPlan {
     if ($Plan.Font) {
         Set-CursorTerminalFont -Font $Plan.Font
     }
+    Save-LastLook -Plan $Plan
     return $ok
 }
 
@@ -3988,6 +4226,7 @@ function Show-DoneScreen {
 
     Write-Color '  Close this terminal, then open it again.' '#F9E2AF'
     Write-Color '  The new window is where you will see the colors, font, prompt, and Fastfetch.' '#C0CAF5'
+    Write-Color '  Run this helper again anytime. Your look will already be selected so you can change just one thing.' '#A6E3A1'
     Write-Host ""
     Write-Color '  What to do now' '#CBA6F7'
     Write-Color '    1. Close this terminal (this tab or window).' '#C0CAF5'
@@ -4032,6 +4271,7 @@ function Start-BetterTerminalSetup {
         $plan.Font = Get-PreferredCatalogItem -Items (Get-FontCatalog) -Names @('Meslo', 'CascadiaCode', 'FiraCode') -Property 'Id'
         $plan.Art = Get-PreferredCatalogItem -Items (Get-AsciiCatalog) -Names @('Windows 11', 'Windows11', 'Windows', 'Auto (detect this PC)') -Property 'Label'
         $plan.Posh = Get-PreferredCatalogItem -Items (Get-PoshCatalog) -Names @('jandedobbeleer', 'M365Princess', 'agnoster') -Property 'Id'
+        Restore-LastLookToPlan -Plan $plan | Out-Null
 
         $picked = Show-ChoiceStudio -Plan $plan
         if (-not $picked) {

@@ -93,7 +93,9 @@ A small WinForms window opens with five tabs:
 | **Prompt** | One official Oh My Posh theme | Colored chips built from that theme’s JSON |
 | **Transparency** | 0 to 100, ticks labeled 0, 10, 20 … 100 | Windows Terminal opacity + acrylic |
 
-**Search** stays on the tab you are on. Example: on Fonts, type `meslo`. On Transparency, type `80`.
+**Search** only filters the tab you are on, and clears when you change tabs. Example: on Fonts, type `meslo`. On Transparency, type `80`.
+
+If you already saved a look, that look is **already selected**. Change only the tab you want, then click **Use this look**.
 
 Terminal-Icons is automatic. There is no icon picker.
 
@@ -108,6 +110,7 @@ The helper then:
 5. Writes Cursor’s terminal font only if that exact Windows family name is installed.
 6. Closes the picker and the preview.
 7. Tells you to **close the terminal and open it again**.
+8. Remembers this look in `%LOCALAPPDATA%\BetterTerminal\last-look.json` so the next run can open with the same colors, font, Fastfetch, prompt, and transparency already selected.
 
 Old files are copied first as `filename.bak.yyyyMMdd-HHmmss`.
 
@@ -207,6 +210,7 @@ No download. The helper writes Windows Terminal `opacity` (0–100) and `useAcry
 
 ```
 %LOCALAPPDATA%\BetterTerminal\
+  last-look.json
   nerd-fonts.json
   themes\windowsterminal\*.json
   posh-themes\*.omp.json
