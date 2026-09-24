@@ -5036,14 +5036,81 @@ function Get-ScriptPolicyBlocker {
     return $null
 }
 
+function Get-NewWindowPolicy {
+    # This helper is started with -ExecutionPolicy Bypass, so its own policy says Bypass.
+    # A brand new PowerShell window has no Process policy, so skip that scope here.
+    $map = @{}
+    try {
+        foreach ($row in @(Get-ExecutionPolicy -List)) {
+            $map[[string]$row.Scope] = [string]$row.ExecutionPolicy
+        }
+    } catch {
+        return 'Restricted'
+    }
+    foreach ($scope in @('MachinePolicy', 'UserPolicy', 'CurrentUser', 'LocalMachine')) {
+        if ($map.ContainsKey($scope)) {
+            $value = $map[$scope]
+            if ($value -and $value -ne 'Undefined') { return $value }
+        }
+    }
+    return 'Restricted'
+}
+
+function Get-SpawnedPolicyText {
+    # Ask a fresh PowerShell what it would use. No -ExecutionPolicy flag on purpose.
+    try {
+        $out = & powershell.exe -NoProfile -Command 'Get-ExecutionPolicy' 2>$null
+        return ([string](@($out) | Select-Object -First 1)).Trim()
+    } catch {
+        return ''
+    }
+}
+
+function Test-NewWindowScripts {
+    param([switch]$Spawn)
+    $value = ''
+    if ($Spawn) { $value = Get-SpawnedPolicyText }
+    if (-not $value) { $value = Get-NewWindowPolicy }
+    return ($value -ne 'Restricted' -and $value -ne 'AllSigned')
+}
+
+function Set-UserScriptPolicy {
+    $done = $false
+    try {
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
+        $done = $true
+    } catch {
+        Write-Color "  The usual way was refused: $($_.Exception.Message)" '#F9E2AF'
+    }
+
+    if (-not $done) {
+        # Write the same value the command writes, under your own account only.
+        try {
+            $key = 'HKCU:\Software\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
+            if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
+            New-ItemProperty -Path $key -Name 'ExecutionPolicy' -Value 'RemoteSigned' -PropertyType String -Force | Out-Null
+            Write-Color '  Set it straight in your own account settings instead.' '#A6E3A1'
+            $done = $true
+        } catch {
+            Write-Color "  That was refused too: $($_.Exception.Message)" '#F38BA8'
+        }
+    }
+
+    # PowerShell 7 keeps its own copy of this setting.
+    if (Test-CommandExists 'pwsh') {
+        try {
+            & pwsh -NoProfile -NonInteractive -Command 'Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force' 2>$null | Out-Null
+        } catch {}
+    }
+    return $done
+}
+
 function Enable-ProfileScripts {
     if ($script:ScriptPolicyChecked) { return -not $script:ScriptsBlocked }
     $script:ScriptPolicyChecked = $true
     $script:ScriptsBlocked = $false
 
-    $effective = 'Restricted'
-    try { $effective = [string](Get-ExecutionPolicy) } catch { return $true }
-    if ($effective -ne 'Restricted' -and $effective -ne 'AllSigned') { return $true }
+    if (Test-NewWindowScripts) { return $true }
 
     Write-Host ""
     Write-Color '  This PC blocks PowerShell scripts, so your new prompt would not start.' '#F9E2AF'
@@ -5056,19 +5123,20 @@ function Enable-ProfileScripts {
         return $false
     }
 
-    Write-Color '  Allowing scripts for your account only. This is the setting Microsoft recommends.' '#CBA6F7'
+    Write-Color '  Allowing scripts for your account only. No administrator needed.' '#CBA6F7'
     Write-Color '  Same as running: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
-    try {
-        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
-        Write-Color '  Scripts are allowed for your account now.' '#A6E3A1'
+    [void](Set-UserScriptPolicy)
+
+    if (Test-NewWindowScripts -Spawn) {
+        Write-Color '  Done. A new PowerShell window can run your prompt now.' '#A6E3A1'
         return $true
-    } catch {
-        $script:ScriptsBlocked = $true
-        Write-Color "  Could not change it: $($_.Exception.Message)" '#F38BA8'
-        Write-Color '  Open PowerShell and run this one line, then run this helper again:' '#F9E2AF'
-        Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
-        return $false
     }
+
+    $script:ScriptsBlocked = $true
+    Write-Color '  Scripts are still blocked on this PC.' '#F38BA8'
+    Write-Color '  Open PowerShell and run this one line, answer Y, then run this helper again:' '#F9E2AF'
+    Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
+    return $false
 }
 
 function Unblock-HelperFiles {
