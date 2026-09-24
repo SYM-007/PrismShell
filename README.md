@@ -50,7 +50,7 @@ The script then:
 
 1. Turns on color output in the console.
 2. Removes a Cursor/VS Code terminal font if that font is **not** installed (this stops the “Unable to find the following fonts” warning).
-3. Relaunches itself in **PowerShell 7** (`pwsh`) when `pwsh` is on PATH, so both PowerShell 5.1 and 7 profiles get the same look.
+3. Stays in the same PowerShell window (no restart), and still writes both the PowerShell 5.1 and PowerShell 7 profiles.
 
 ### 2. You type Y (or O)
 
@@ -60,7 +60,7 @@ The helper builds a plan. With **Y**, that plan is:
 - Install a Nerd Font (Meslo now; another font only when you click **Use this look**)
 - Install Fastfetch
 - Install Terminal-Icons
-- Later apply colors, transparency, Fastfetch art, and a nicer command line
+- Later apply colors, transparency, art, a Fastfetch look, and a nicer command line
 
 ### 3. Everything downloads first
 
@@ -83,17 +83,18 @@ Lists are cached under `%LOCALAPPDATA%\BetterTerminal` so the next run does not 
 
 ### 4. The picker window opens
 
-A small WinForms window opens with five tabs:
+A dark picker window opens. The live preview is at the top. Under it, a hint tells you what the current tab does, then six tabs:
 
 | Tab | What you pick | Preview |
 | --- | --- | --- |
 | **Colors** | One scheme from the full iTerm2 / Windows Terminal Themes pack | Live colors in the mini terminal, and in Windows Terminal if it is open |
 | **Fonts** | One official Nerd Font name | Sample text. The zip is **not** downloaded yet |
-| **Fastfetch** | One official logo, Auto, No logo, or a small extra picture | Real `fastfetch --config none --pipe` output |
+| **Art** | One official Fastfetch logo, Auto, No logo, a small extra picture, or **your own named ASCII art** | Shown on the left of the Fastfetch preview |
+| **Fastfetch** | Turn each info line on or off with its own tick box, pick a **Quick set** (Default, Graphics, Neofetch, Small, All, Logo only), and choose a picture color and an info text color | Real `fastfetch --pipe` output that redraws every time you tick a line |
 | **Prompt** | One official Oh My Posh theme | Colored chips built from that theme’s JSON |
-| **Transparency** | 0 to 100, ticks labeled 0, 10, 20 … 100 | Windows Terminal opacity + acrylic |
+| **Transparency** | Drag the slider, or click a number (0, 10, 20 … 100) under it to jump straight there | Windows Terminal opacity + acrylic |
 
-**Search** only filters the tab you are on, and clears when you change tabs. Example: on Fonts, type `meslo`. On Transparency, type `80`.
+**Search** only filters the tab you are on, and clears when you change tabs. Example: on Fonts, type `meslo`. On Fastfetch, type `memory`. On Transparency, type `80`.
 
 If you already saved a look, that look is **already selected**. Change only the tab you want, then click **Use this look**.
 
@@ -110,7 +111,7 @@ The helper then:
 5. Writes Cursor’s terminal font only if that exact Windows family name is installed.
 6. Closes the picker and the preview.
 7. Tells you to **close the terminal and open it again**.
-8. Remembers this look in `%LOCALAPPDATA%\BetterTerminal\last-look.json` so the next run can open with the same colors, font, Fastfetch, prompt, and transparency already selected.
+8. Remembers this look in `%LOCALAPPDATA%\BetterTerminal\last-look.json` so the next run can open with the same colors, font, art, Fastfetch lines, prompt, and transparency already selected.
 
 Old files are copied first as `filename.bak.yyyyMMdd-HHmmss`.
 
@@ -186,7 +187,7 @@ The helper only saves a font name that `InstalledFontCollection` can see. That i
 | Project | https://github.com/fastfetch-cli/fastfetch |
 | Latest Windows zip | GitHub latest release, asset matching `windows-amd64.zip` |
 | Logo list | `fastfetch --list-logos` (built into the program, not a website scrape) |
-| Preview command | `fastfetch --config none --pipe` plus `--logo-type builtin` / `small` / `auto` / `none` |
+| Preview command | `fastfetch --config <temp>.jsonc --pipe` using your **Art**, your ticked info lines, and your two picture colors plus the info text color |
 | Ideas for extra pictures | https://www.asciiart.eu/gallery (the extras in the picker are original small drawings, not copied from that site) |
 
 **Current full list: 639 built-in logo names in [CATALOG.md](CATALOG.md).** On Windows the useful ones are `Windows 11`, `Windows`, `Windows 11_small`, `Windows 10`, `Windows 8`, and `Auto (detect this PC)`.
@@ -210,8 +211,10 @@ No download. The helper writes Windows Terminal `opacity` (0–100) and `useAcry
 
 ```
 %LOCALAPPDATA%\BetterTerminal\
-  last-look.json
+  last-look.json          (includes FetchLook, LogoColor1, LogoColor2)
   nerd-fonts.json
+  custom-ascii\index.json
+  custom-ascii\custom-*.txt
   themes\windowsterminal\*.json
   posh-themes\*.omp.json
 ```
@@ -239,7 +242,31 @@ The chosen theme object is also added to the `schemes` array.
 %USERPROFILE%\.config\fastfetch\logo.txt    (only if you pick an extra / file logo)
 ```
 
-`config.jsonc` is UTF-8 **without a BOM** (Fastfetch rejects a BOM). Modules written: title, os, host, kernel, uptime, shell, terminal, cpu, gpu, memory, disk, colors.
+`config.jsonc` is UTF-8 **without a BOM** (Fastfetch rejects a BOM). The helper writes the official Fastfetch style:
+
+```jsonc
+{
+    "logo": {
+        "type": "auto",
+        "color": { "1": "cyan", "2": "blue" }
+    },
+    "display": {
+        "separator": ": ",
+        "color": { "keys": "blue" }
+    },
+    "modules": [ "title", "separator", "os", "host" ]
+}
+```
+
+The three color rows on the **Fastfetch** tab map to Fastfetch settings like this:
+
+| Row in the picker | Fastfetch setting | What it paints |
+| --- | --- | --- |
+| Picture color | `logo.color.1` (same as `fastfetch --logo-color-1`) | The drawing on the left |
+| Picture 2nd color | `logo.color.2` (same as `fastfetch --logo-color-2`) | The second shade of that drawing |
+| Info text color | `display.color.keys` | The `OS:`, `CPU:`, `Memory:` labels on the right |
+
+Every tick box on that tab is one entry in `modules`. Ticking a line adds it, unticking removes it, and the list is always written in the official Fastfetch order no matter what order you clicked. **Quick sets** just tick a whole group at once: Default, Graphics (adds Vulkan / OpenGL / OpenCL), Neofetch, Small, All, or Logo only (no info lines at all).
 
 ### PowerShell profiles
 
@@ -320,6 +347,8 @@ To get **every** hex value for the other 581 themes, open the matching file in `
 ### Extra Fastfetch pictures (not official logos)
 
 These small drawings ship in the script. Category names follow [asciiart.eu/gallery](https://www.asciiart.eu/gallery). The pictures themselves are original.
+
+You can also add your own. On the **Art** tab click **Add my art**, type a name, paste or load a `.txt` picture, then **Save art**. Those stay in `%LOCALAPPDATA%\BetterTerminal\custom-ascii\` and show at the top of the list. **Remove** deletes only a picture you added.
 
 | Id | Label | Category |
 | --- | --- | --- |
@@ -457,6 +486,8 @@ Other logo choices:
 | Small picture | `small` | `Windows` |
 | No picture | `none` | omit `source` |
 | Your own text file | `file` | full path to a `.txt` file |
+
+To add named pictures by hand, save a UTF-8 `.txt` file and a row in `%LOCALAPPDATA%\BetterTerminal\custom-ascii\index.json`, or use **Add my art** in the picker.
 
 Test it:
 

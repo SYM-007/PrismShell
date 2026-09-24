@@ -789,8 +789,13 @@ function Get-PoshCatalog {
 }
 
 function Get-AsciiCatalog {
-    if ($script:AllArts -and $script:AllArts.Count -gt 0) { return $script:AllArts }
-    @(
+    $custom = @()
+    try { $custom = @(Get-CustomAsciiCatalog) } catch { $custom = @() }
+    if ($script:AllArts -and $script:AllArts.Count -gt 0) {
+        $rest = @($script:AllArts | Where-Object { [string]$_.Kind -ne 'custom' })
+        return @($custom + $rest)
+    }
+    @($custom) + @(
         @{
             Id = 'windows11'
             Category = 'Official Fastfetch'
@@ -1095,7 +1100,11 @@ function Read-Choice {
     )
     $suffix = if ($Default) { "  (press Enter for $Default)" } else { '' }
     Write-Color -NoNewline "  > $Prompt$suffix : " '#7DCFFF'
-    $value = Read-Host
+    try {
+        $value = Read-Host
+    } catch {
+        return $Default
+    }
     if ([string]::IsNullOrWhiteSpace($value)) { return $Default }
     return $value.Trim()
 }
@@ -1106,7 +1115,11 @@ function Read-YesNo {
         [string]$Default = 'Y'
     )
     $hint = if ($Default -match '^[Yy]') { 'Y = yes, N = no' } else { 'N = no, Y = yes' }
-    $answer = Read-Choice -Prompt "$Prompt  ($hint)" -Default $Default
+    try {
+        $answer = Read-Choice -Prompt "$Prompt  ($hint)" -Default $Default
+    } catch {
+        $answer = $Default
+    }
     return ($answer -match '^[Yy]')
 }
 
@@ -1143,6 +1156,9 @@ function Show-SourceCard {
 
 function ConvertTo-DrawingColor {
     param([string]$Hex)
+    if ([string]::IsNullOrWhiteSpace($Hex)) {
+        return [System.Drawing.Color]::FromArgb(40, 42, 54)
+    }
     try {
         return [System.Drawing.ColorTranslator]::FromHtml($Hex)
     } catch {
@@ -1163,29 +1179,122 @@ function Blend-DrawingColor {
     return [System.Drawing.Color]::FromArgb(255, $r, $g, $b)
 }
 
-function Update-GlassTickLabels {
-    $bar = $script:GlassTicks
-    $slider = $script:GlassSlider
-    if (-not $bar -or -not $slider) { return }
-    $bar.Controls.Clear()
-    $w = $slider.ClientSize.Width
-    if ($w -lt 40) { return }
-    $pad = 14
-    $inner = [Math]::Max(1, $w - (2 * $pad))
-    foreach ($n in 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100) {
-        $lbl = New-Object System.Windows.Forms.Label
-        $lbl.AutoSize = $true
-        $lbl.Text = [string]$n
-        $lbl.ForeColor = [System.Drawing.Color]::FromArgb(200, 205, 216)
-        $lbl.BackColor = $bar.BackColor
-        $lbl.Font = New-Object System.Drawing.Font('Segoe UI', 8, [System.Drawing.FontStyle]::Bold)
-        [void]$bar.Controls.Add($lbl)
-        $x = $pad + [int](($inner * $n) / 100) - [int]($lbl.PreferredSize.Width / 2)
-        if ($x -lt 0) { $x = 0 }
-        $maxX = [Math]::Max(0, $bar.ClientSize.Width - $lbl.PreferredSize.Width)
-        if ($x -gt $maxX) { $x = $maxX }
-        $lbl.Location = New-Object System.Drawing.Point($x, 1)
+function Get-GlassMarks {
+    return @(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+}
+
+function Get-GlassEdgePad {
+    return 16
+}
+
+function Get-GlassX {
+    param([int]$Value, [int]$Width)
+    $pad = Get-GlassEdgePad
+    $inner = [Math]::Max(1, $Width - (2 * $pad))
+    $n = [Math]::Min(100, [Math]::Max(0, $Value))
+    return $pad + [int][Math]::Round(($n / 100.0) * $inner)
+}
+
+function Get-GlassValueAtX {
+    param([int]$X, [int]$Width)
+    $pad = Get-GlassEdgePad
+    $inner = [Math]::Max(1, $Width - (2 * $pad))
+    $v = [int][Math]::Round((($X - $pad) / [double]$inner) * 100.0)
+    return [Math]::Min(100, [Math]::Max(0, $v))
+}
+
+function Get-GlassValue {
+    if ($null -eq $script:GlassValue) { return 80 }
+    return [Math]::Min(100, [Math]::Max(0, [int]$script:GlassValue))
+}
+
+function Set-StudioOpacity {
+    param([int]$Value)
+    $n = [Math]::Min(100, [Math]::Max(0, [int]$Value))
+    $changed = ((Get-GlassValue) -ne $n)
+    $script:GlassValue = $n
+    if ($script:StudioPlan) { $script:StudioPlan.Opacity = $n }
+    if ($script:GlassPct) { $script:GlassPct.Text = "$n%" }
+    Update-GlassTickLabels
+    if ($changed -and $script:StudioReady) {
+        Sync-LastLookCache
+        Update-StudioPreview
     }
+}
+
+function Update-GlassTickLabels {
+    foreach ($surface in @($script:GlassTrack, $script:GlassTicks)) {
+        if ($surface -and -not $surface.IsDisposed) { $surface.Invalidate() }
+    }
+}
+
+function Draw-GlassTrack {
+    param($Surface, $Graphics)
+    if (-not $Surface -or -not $Graphics) { return }
+    $g = $Graphics
+    $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $w = $Surface.ClientSize.Width
+    $h = $Surface.ClientSize.Height
+    if ($w -lt 40) { return }
+    $pad = Get-GlassEdgePad
+    $inner = [Math]::Max(1, $w - (2 * $pad))
+    $value = Get-GlassValue
+    $x = Get-GlassX -Value $value -Width $w
+    $midY = [int]($h / 2)
+
+    $rail = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(58, 64, 82))
+    $g.FillRectangle($rail, $pad, ($midY - 3), $inner, 6)
+    $rail.Dispose()
+
+    $fillW = $x - $pad
+    if ($fillW -gt 0) {
+        $fill = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(99, 132, 255))
+        $g.FillRectangle($fill, $pad, ($midY - 3), $fillW, 6)
+        $fill.Dispose()
+    }
+
+    $knob = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(236, 240, 252))
+    $g.FillEllipse($knob, ($x - 9), ($midY - 9), 18, 18)
+    $knob.Dispose()
+    $ring = New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(99, 132, 255)), 3
+    $g.DrawEllipse($ring, ($x - 9), ($midY - 9), 18, 18)
+    $ring.Dispose()
+}
+
+function Draw-GlassTickScale {
+    param($Surface, $Graphics)
+    if (-not $Surface -or -not $Graphics) { return }
+    $g = $Graphics
+    $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $w = $Surface.ClientSize.Width
+    if ($w -lt 40) { return }
+    $current = Get-GlassValue
+    $font = New-Object System.Drawing.Font('Segoe UI', 8, [System.Drawing.FontStyle]::Bold)
+    $line = [System.Drawing.Color]::FromArgb(92, 100, 120)
+    $accent = [System.Drawing.Color]::FromArgb(99, 132, 255)
+    $muted = [System.Drawing.Color]::FromArgb(186, 194, 210)
+    $hot = [System.Drawing.Color]::FromArgb(236, 238, 246)
+    $flags = [System.Windows.Forms.TextFormatFlags]::HorizontalCenter -bor
+             [System.Windows.Forms.TextFormatFlags]::Top -bor
+             [System.Windows.Forms.TextFormatFlags]::NoPadding -bor
+             [System.Windows.Forms.TextFormatFlags]::SingleLine
+    foreach ($n in Get-GlassMarks) {
+        $x = Get-GlassX -Value $n -Width $w
+        $on = ($current -eq $n)
+        $pen = New-Object System.Drawing.Pen $(if ($on) { $accent } else { $line }), $(if ($on) { 2 } else { 1 })
+        $g.DrawLine($pen, $x, 0, $x, 6)
+        $pen.Dispose()
+        $ink = if ($on) { $hot } else { $muted }
+        $box = New-Object System.Drawing.Rectangle (($x - 20), 7, 40, 15)
+        [System.Windows.Forms.TextRenderer]::DrawText($g, [string]$n, $font, $box, $ink, $flags)
+    }
+    $font.Dispose()
+}
+
+function Get-GlassSnapValue {
+    param([int]$X, [int]$Width)
+    $raw = Get-GlassValueAtX -X $X -Width $Width
+    return [int]([Math]::Round($raw / 10.0) * 10)
 }
 
 function Initialize-PreviewPopup {
@@ -1440,7 +1549,136 @@ function Get-ThemeShade {
     return 'Dark'
 }
 
+function Get-StudioTheme {
+    if ($script:StudioTheme) { return $script:StudioTheme }
+    $script:StudioTheme = [pscustomobject]@{
+        Bg         = [System.Drawing.Color]::FromArgb(15, 17, 23)
+        Surface    = [System.Drawing.Color]::FromArgb(21, 24, 32)
+        Surface2   = [System.Drawing.Color]::FromArgb(28, 32, 42)
+        Border     = [System.Drawing.Color]::FromArgb(46, 50, 66)
+        Text       = [System.Drawing.Color]::FromArgb(236, 238, 246)
+        Muted      = [System.Drawing.Color]::FromArgb(142, 150, 168)
+        Accent     = [System.Drawing.Color]::FromArgb(99, 132, 255)
+        AccentSoft = [System.Drawing.Color]::FromArgb(36, 44, 72)
+        Success    = [System.Drawing.Color]::FromArgb(46, 168, 110)
+        GridBg     = [System.Drawing.Color]::FromArgb(18, 20, 28)
+        GridAlt    = [System.Drawing.Color]::FromArgb(24, 27, 36)
+        Wall       = [System.Drawing.Color]::FromArgb(70, 86, 116)
+    }
+    return $script:StudioTheme
+}
+
+function Enable-StudioDoubleBuffer {
+    param($Control)
+    if (-not $Control) { return }
+    try {
+        $prop = $Control.GetType().GetProperty('DoubleBuffered', [Reflection.BindingFlags]'Instance,NonPublic')
+        if ($prop) { $prop.SetValue($Control, $true, $null) }
+    } catch {}
+}
+
+function New-StudioButton {
+    param(
+        [string]$Text,
+        [string]$Kind = 'ghost',
+        [int]$Width = 140,
+        [int]$Height = 38
+    )
+    $t = Get-StudioTheme
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = $Text
+    $btn.Size = New-Object System.Drawing.Size($Width, $Height)
+    $btn.FlatStyle = 'Flat'
+    $btn.Cursor = [System.Windows.Forms.Cursors]::Hand
+    $btn.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+    $btn.UseMnemonic = $false
+    $btn.FlatAppearance.BorderSize = 0
+    if ($Kind -eq 'primary') {
+        $btn.BackColor = $t.Success
+        $btn.ForeColor = [System.Drawing.Color]::White
+    } else {
+        $btn.BackColor = $t.Surface2
+        $btn.ForeColor = $t.Text
+        $btn.FlatAppearance.BorderSize = 1
+        $btn.FlatAppearance.BorderColor = $t.Border
+    }
+    return $btn
+}
+
+function Get-StudioTabGuide {
+    $name = ''
+    if ($script:StudioTabs -and $script:StudioTabs.SelectedTab) {
+        $name = [string]$script:StudioTabs.SelectedTab.Text
+    }
+    switch ($name) {
+        'Colors' { return 'Click a color. The preview updates right away.' }
+        'Fonts' { return 'Click a font to preview it. The zip downloads only when you press Use this look.' }
+        'Art' { return 'Click a picture for Fastfetch. Add my art keeps a drawing on this PC.' }
+        'Fastfetch' { return 'Turn each info line on or off. The preview above changes as you click.' }
+        'Prompt' { return 'Click a prompt. The colored line under the preview is that prompt.' }
+        'Transparency' { return '' }
+        default { return 'Click a tab, pick what you like, then Use this look.' }
+    }
+}
+
+function Get-StudioSearchCue {
+    $name = ''
+    if ($script:StudioTabs -and $script:StudioTabs.SelectedTab) {
+        $name = [string]$script:StudioTabs.SelectedTab.Text
+    }
+    switch ($name) {
+        'Colors' { return 'Search colors, like dracula' }
+        'Fonts' { return 'Search fonts, like meslo' }
+        'Art' { return 'Search art, like windows' }
+        'Fastfetch' { return 'Search info lines, like memory' }
+        'Prompt' { return 'Search prompts, like atomic' }
+        'Transparency' { return 'Type a number from 0 to 100' }
+        default { return 'Search this tab' }
+    }
+}
+
+function Update-StudioTabButtons {
+    $current = ''
+    if ($script:StudioTabs -and $script:StudioTabs.SelectedTab) {
+        $current = [string]$script:StudioTabs.SelectedTab.Text
+    }
+    foreach ($btn in @($script:StudioTabButtons)) {
+        if (-not $btn) { continue }
+        $on = ([string]$btn.Tag -eq $current)
+        $btn.UseVisualStyleBackColor = $false
+        $btn.BackColor = if ($on) {
+            [System.Drawing.Color]::FromArgb(36, 44, 72)
+        } else {
+            [System.Drawing.Color]::FromArgb(28, 32, 42)
+        }
+        $btn.ForeColor = if ($on) {
+            [System.Drawing.Color]::FromArgb(236, 238, 246)
+        } else {
+            [System.Drawing.Color]::FromArgb(210, 214, 228)
+        }
+        $btn.FlatAppearance.BorderColor = if ($on) {
+            [System.Drawing.Color]::FromArgb(99, 132, 255)
+        } else {
+            [System.Drawing.Color]::FromArgb(46, 50, 66)
+        }
+        $btn.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+    }
+}
+
+function Update-StudioChrome {
+    Update-StudioTabButtons
+    if ($script:StudioGuide) {
+        $script:StudioGuide.Text = Get-StudioTabGuide
+        $script:StudioGuide.Visible = -not [string]::IsNullOrWhiteSpace($script:StudioGuide.Text)
+    }
+    if (-not $script:StudioSearchCue) { return }
+    $empty = (-not $script:StudioSearch) -or [string]::IsNullOrWhiteSpace([string]$script:StudioSearch.Text)
+    $script:StudioSearchCue.Text = Get-StudioSearchCue
+    $script:StudioSearchCue.Visible = [bool]$empty
+}
+
 function New-ClickTable {
+    $t = Get-StudioTheme
     $grid = New-Object System.Windows.Forms.DataGridView
     $grid.Dock = 'Fill'
     $grid.ReadOnly = $true
@@ -1451,21 +1689,29 @@ function New-ClickTable {
     $grid.MultiSelect = $false
     $grid.RowHeadersVisible = $false
     $grid.AutoSizeColumnsMode = 'Fill'
-    $grid.BackgroundColor = [System.Drawing.Color]::FromArgb(28, 28, 34)
-    $grid.GridColor = [System.Drawing.Color]::FromArgb(50, 50, 58)
+    $grid.BackgroundColor = $t.GridBg
+    $grid.GridColor = $t.Border
     $grid.BorderStyle = 'None'
+    $grid.CellBorderStyle = 'SingleHorizontal'
+    $grid.ColumnHeadersBorderStyle = 'None'
     $grid.EnableHeadersVisualStyles = $false
-    $grid.ColumnHeadersDefaultCellStyle.BackColor = [System.Drawing.Color]::FromArgb(45, 48, 62)
-    $grid.ColumnHeadersDefaultCellStyle.ForeColor = [System.Drawing.Color]::White
-    $grid.ColumnHeadersDefaultCellStyle.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
-    $grid.ColumnHeadersHeight = 34
-    $grid.DefaultCellStyle.BackColor = [System.Drawing.Color]::FromArgb(34, 36, 46)
-    $grid.DefaultCellStyle.ForeColor = [System.Drawing.Color]::FromArgb(230, 232, 240)
-    $grid.DefaultCellStyle.SelectionBackColor = [System.Drawing.Color]::FromArgb(88, 130, 247)
+    $grid.ColumnHeadersDefaultCellStyle.BackColor = $t.Surface2
+    $grid.ColumnHeadersDefaultCellStyle.ForeColor = $t.Muted
+    $grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = $t.Surface2
+    $grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = $t.Muted
+    $grid.ColumnHeadersDefaultCellStyle.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Bold)
+    $grid.ColumnHeadersHeight = 36
+    $grid.DefaultCellStyle.BackColor = $t.GridBg
+    $grid.DefaultCellStyle.ForeColor = $t.Text
+    $grid.DefaultCellStyle.SelectionBackColor = $t.Accent
     $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::White
     $grid.DefaultCellStyle.Font = New-Object System.Drawing.Font('Segoe UI', 10)
-    $grid.RowTemplate.Height = 30
-    $grid.AlternatingRowsDefaultCellStyle.BackColor = [System.Drawing.Color]::FromArgb(40, 42, 54)
+    $grid.DefaultCellStyle.Padding = New-Object System.Windows.Forms.Padding(10, 4, 8, 4)
+    $grid.RowTemplate.Height = 34
+    $grid.AlternatingRowsDefaultCellStyle.BackColor = $t.GridAlt
+    $grid.AlternatingRowsDefaultCellStyle.SelectionBackColor = $t.Accent
+    $grid.AlternatingRowsDefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::White
+    Enable-StudioDoubleBuffer $grid
     return $grid
 }
 
@@ -1545,7 +1791,7 @@ function Update-StudioPreview {
     $ui.Title.ForeColor = $themeBg
     $fontLabel = if ($Font) { $Font.Label } else { 'font' }
     $artLabel = if ($Art) { $Art.Label } else { 'logo' }
-    $ui.Title.Text = "  $artLabel    $fontLabel    $($Theme.name)    $Opacity% solid"
+    $ui.Title.Text = "  Live preview    $artLabel  ·  $fontLabel  ·  $($Theme.name)  ·  $Opacity%"
     $ui.Art.BackColor = $bg
     $ui.Art.ForeColor = $fg
     if ($ui.Info) {
@@ -1600,7 +1846,11 @@ function Update-StudioPreview {
 
     if ($ui.Picks) {
         $prefix = if ($script:RestoredLastLook) { 'Last look:' } else { 'Selected:' }
-        $ui.Picks.Text = "$prefix  $($Theme.name)   |   $(if ($Font) { $Font.Label } else { 'font' })   |   $(if ($Art) { $Art.Label } else { 'art' })   |   $(if ($Posh) { $Posh.Label } else { 'prompt' })   |   $Opacity%"
+        $c1 = Get-PlanLogoColor $script:StudioPlan 1 'cyan'
+        $ck = Get-PlanKeyColor $script:StudioPlan 'blue'
+        $lineCount = @(Get-PlanFastfetchModuleIds $script:StudioPlan).Count
+        $fetchLabel = "$lineCount lines, picture $c1, info $ck"
+        $ui.Picks.Text = "$prefix  $($Theme.name)   |   $(if ($Font) { $Font.Label } else { 'font' })   |   $(if ($Art) { $Art.Label } else { 'art' })   |   Fastfetch $fetchLabel   |   $(if ($Posh) { $Posh.Label } else { 'prompt' })   |   $Opacity%"
     }
 
     Update-WindowsTerminalLivePreview -Theme $Theme -Font $Font -Opacity $Opacity
@@ -1609,17 +1859,18 @@ function Update-StudioPreview {
 function Filter-ClickTable {
     param($Grid, [string]$Query)
     if (-not $Grid) { return }
+    try { $Grid.CurrentCell = $null } catch {}
+    try { $Grid.ClearSelection() } catch {}
     foreach ($row in $Grid.Rows) {
         if ($row.IsNewRow) { continue }
-        if ([string]::IsNullOrWhiteSpace($Query)) {
-            $row.Visible = $true
-            continue
+        $hit = $true
+        if (-not [string]::IsNullOrWhiteSpace($Query)) {
+            $hit = $false
+            foreach ($cell in $row.Cells) {
+                if ([string]$cell.Value -like "*$Query*") { $hit = $true; break }
+            }
         }
-        $hit = $false
-        foreach ($cell in $row.Cells) {
-            if ([string]$cell.Value -like "*$Query*") { $hit = $true; break }
-        }
-        $row.Visible = $hit
+        try { $row.Visible = $hit } catch {}
     }
 }
 
@@ -1652,7 +1903,8 @@ function Get-CurrentStudioGrid {
     switch ($name) {
         'Colors' { return $script:ThemeGrid }
         'Fonts' { return $script:FontGrid }
-        'Fastfetch' { return $script:ArtGrid }
+        'Art' { return $script:ArtGrid }
+        'Fastfetch' { return $script:FetchGrid }
         'Prompt' { return $script:PoshGrid }
         default { return $null }
     }
@@ -1667,6 +1919,7 @@ function Update-StudioSearch {
     Filter-ClickTable -Grid $script:ThemeGrid -Query ''
     Filter-ClickTable -Grid $script:FontGrid -Query ''
     Filter-ClickTable -Grid $script:ArtGrid -Query ''
+    Filter-ClickTable -Grid $script:FetchGrid -Query ''
     Filter-ClickTable -Grid $script:PoshGrid -Query ''
 
     $tabName = ''
@@ -1677,14 +1930,15 @@ function Update-StudioSearch {
     if ($tabName -eq 'Transparency') {
         if ($q -match '^\d{1,3}$') {
             $n = [int]$q
-            if ($n -ge 0 -and $n -le 100 -and $script:GlassSlider) {
-                $script:GlassSlider.Value = $n
+            if ($n -ge 0 -and $n -le 100) {
+                Set-StudioOpacity $n
             }
         }
         return
     }
 
     Filter-ClickTable -Grid (Get-CurrentStudioGrid) -Query $q
+    Update-StudioChrome
 }
 
 function Add-PromptChip {
@@ -1769,6 +2023,243 @@ function Update-PromptStrip {
     }
 }
 
+function Show-AddCustomArtDialog {
+    $script:CustomArtDraft = $null
+    $t = Get-StudioTheme
+    $dlg = New-Object System.Windows.Forms.Form
+    $dlg.Text = 'Add my ASCII art'
+    $dlg.Size = New-Object System.Drawing.Size(700, 580)
+    $dlg.MinimumSize = New-Object System.Drawing.Size(540, 440)
+    $dlg.StartPosition = 'CenterParent'
+    $dlg.TopMost = $true
+    $dlg.BackColor = $t.Bg
+    $dlg.ForeColor = $t.Text
+    $dlg.Font = New-Object System.Drawing.Font('Segoe UI', 10)
+    Enable-StudioDoubleBuffer $dlg
+
+    $nameLabel = New-Object System.Windows.Forms.Label
+    $nameLabel.Text = 'Name'
+    $nameLabel.Location = New-Object System.Drawing.Point(20, 18)
+    $nameLabel.AutoSize = $true
+    $nameLabel.ForeColor = $t.Muted
+
+    $nameBox = New-Object System.Windows.Forms.TextBox
+    $nameBox.Location = New-Object System.Drawing.Point(78, 14)
+    $nameBox.Width = 440
+    $nameBox.BackColor = $t.Surface2
+    $nameBox.ForeColor = $t.Text
+    $nameBox.BorderStyle = 'FixedSingle'
+    $nameBox.Text = ''
+
+    $artLabel = New-Object System.Windows.Forms.Label
+    $artLabel.Text = 'Picture — type, paste, or load a .txt file'
+    $artLabel.Location = New-Object System.Drawing.Point(20, 52)
+    $artLabel.AutoSize = $true
+    $artLabel.ForeColor = $t.Muted
+
+    $artBox = New-Object System.Windows.Forms.TextBox
+    $artBox.Location = New-Object System.Drawing.Point(20, 78)
+    $artBox.Size = New-Object System.Drawing.Size(640, 390)
+    $artBox.Anchor = 'Top,Bottom,Left,Right'
+    $artBox.Multiline = $true
+    $artBox.AcceptsTab = $true
+    $artBox.ScrollBars = 'Both'
+    $artBox.WordWrap = $false
+    $artBox.Font = New-Object System.Drawing.Font('Consolas', 10)
+    $artBox.BackColor = $t.GridBg
+    $artBox.ForeColor = $t.Text
+    $artBox.BorderStyle = 'FixedSingle'
+    $artBox.Text = ''
+
+    $load = New-StudioButton -Text 'Load .txt' -Kind 'ghost' -Width 108 -Height 34
+    $load.Location = New-Object System.Drawing.Point(20, 486)
+    $load.Anchor = 'Bottom,Left'
+    $load.Add_Click({
+        $ofd = New-Object System.Windows.Forms.OpenFileDialog
+        $ofd.Filter = 'Text files (*.txt)|*.txt|All files (*.*)|*.*'
+        $ofd.Title = 'Load ASCII art'
+        if ($ofd.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+            $script:CustomArtFileBox.Text = [IO.File]::ReadAllText($ofd.FileName)
+            if ([string]::IsNullOrWhiteSpace($script:CustomArtNameBox.Text)) {
+                $script:CustomArtNameBox.Text = [IO.Path]::GetFileNameWithoutExtension($ofd.FileName)
+            }
+        }
+    })
+
+    $save = New-StudioButton -Text 'Save art' -Kind 'primary' -Width 112 -Height 34
+    $save.Location = New-Object System.Drawing.Point(440, 486)
+    $save.Anchor = 'Bottom,Right'
+    $save.Add_Click({
+        $name = [string]$script:CustomArtNameBox.Text
+        $lines = @($script:CustomArtFileBox.Lines)
+        if ([string]::IsNullOrWhiteSpace($name)) {
+            [System.Windows.Forms.MessageBox]::Show('Type a name for this picture.', 'Add my ASCII art') | Out-Null
+            return
+        }
+        if (-not ($lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
+            [System.Windows.Forms.MessageBox]::Show('Paste or type the ASCII picture first.', 'Add my ASCII art') | Out-Null
+            return
+        }
+        $script:CustomArtDraft = [pscustomobject]@{ Label = $name.Trim(); Lines = $lines }
+        $script:CustomArtDialog.DialogResult = [System.Windows.Forms.DialogResult]::OK
+        $script:CustomArtDialog.Close()
+    })
+
+    $cancel = New-StudioButton -Text 'Cancel' -Kind 'ghost' -Width 104 -Height 34
+    $cancel.Location = New-Object System.Drawing.Point(560, 486)
+    $cancel.Anchor = 'Bottom,Right'
+    $cancel.Add_Click({
+        $script:CustomArtDraft = $null
+        $script:CustomArtDialog.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+        $script:CustomArtDialog.Close()
+    })
+
+    $dlg.Controls.Add($nameLabel)
+    $dlg.Controls.Add($nameBox)
+    $dlg.Controls.Add($artLabel)
+    $dlg.Controls.Add($artBox)
+    $dlg.Controls.Add($load)
+    $dlg.Controls.Add($save)
+    $dlg.Controls.Add($cancel)
+    $dlg.CancelButton = $cancel
+
+    $script:CustomArtDialog = $dlg
+    $script:CustomArtNameBox = $nameBox
+    $script:CustomArtFileBox = $artBox
+    $owner = $null
+    if ($script:StudioForm -and -not $script:StudioForm.IsDisposed) { $owner = $script:StudioForm }
+    if ($owner) { [void]$dlg.ShowDialog($owner) } else { [void]$dlg.ShowDialog() }
+    return $script:CustomArtDraft
+}
+
+function Update-CustomArtButtons {
+    if (-not $script:RemoveArtButton) { return }
+    $art = $null
+    if ($script:StudioPlan) { $art = $script:StudioPlan.Art }
+    $script:RemoveArtButton.Enabled = [bool]($art -and [string]$art.Kind -eq 'custom')
+}
+
+function Get-FastfetchLogoColorNames {
+    @('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
+}
+
+function Get-FastfetchLogoChipColor {
+    param([string]$Name)
+    switch ([string]$Name) {
+        'black' { return [System.Drawing.Color]::FromArgb(28, 28, 32) }
+        'red' { return [System.Drawing.Color]::FromArgb(220, 70, 70) }
+        'green' { return [System.Drawing.Color]::FromArgb(80, 180, 90) }
+        'yellow' { return [System.Drawing.Color]::FromArgb(220, 190, 70) }
+        'blue' { return [System.Drawing.Color]::FromArgb(70, 120, 220) }
+        'magenta' { return [System.Drawing.Color]::FromArgb(180, 80, 180) }
+        'cyan' { return [System.Drawing.Color]::FromArgb(70, 190, 200) }
+        default { return [System.Drawing.Color]::FromArgb(230, 230, 230) }
+    }
+}
+
+function Get-PlanLogoColor {
+    param($Plan, [int]$Slot, [string]$Fallback = 'cyan')
+    $prop = if ($Slot -eq 1) { 'LogoColor1' } else { 'LogoColor2' }
+    $val = $Fallback
+    if ($Plan -and $Plan.PSObject.Properties[$prop] -and $Plan.$prop) {
+        $val = [string]$Plan.$prop
+    }
+    $val = $val.Trim().ToLowerInvariant()
+    if ((Get-FastfetchLogoColorNames) -notcontains $val) { return $Fallback }
+    return $val
+}
+
+function Get-PlanKeyColor {
+    param($Plan, [string]$Fallback = 'blue')
+    $val = $Fallback
+    if ($Plan -and $Plan.PSObject.Properties['KeyColor'] -and $Plan.KeyColor) {
+        $val = [string]$Plan.KeyColor
+    }
+    $val = $val.Trim().ToLowerInvariant()
+    if ((Get-FastfetchLogoColorNames) -notcontains $val) { return $Fallback }
+    return $val
+}
+
+function Set-PlanFastfetchLook {
+    param($Look)
+    if (-not $script:StudioPlan -or -not $Look) { return }
+    $script:StudioPlan.FetchLook = [string]$Look.Id
+    $script:StudioPlan.FetchModules = @($Look.Modules)
+}
+
+function Update-FastfetchCountLabel {
+    if (-not $script:FetchCountLabel) { return }
+    $ids = @(Get-PlanFastfetchModuleIds $script:StudioPlan)
+    $total = @(Get-FastfetchModuleCatalog).Count
+    if ($ids.Count -eq 0) {
+        $script:FetchCountLabel.Text = 'Picture only, no info lines'
+    } else {
+        $script:FetchCountLabel.Text = "$($ids.Count) of $total info lines are on"
+    }
+}
+
+function Update-FastfetchGridChecks {
+    if (-not $script:FetchGrid) { return }
+    $ids = @(Get-PlanFastfetchModuleIds $script:StudioPlan)
+    $script:FetchGridLoading = $true
+    try {
+        foreach ($row in $script:FetchGrid.Rows) {
+            if ($row.IsNewRow -or -not $row.Tag) { continue }
+            $row.Cells[0].Value = [bool]($ids -contains [string]$row.Tag.Id)
+        }
+    } finally {
+        $script:FetchGridLoading = $false
+    }
+    Update-FastfetchCountLabel
+}
+
+function Sync-FastfetchModulesFromGrid {
+    if (-not $script:FetchGrid -or -not $script:StudioPlan) { return }
+    $ids = @()
+    foreach ($row in $script:FetchGrid.Rows) {
+        if ($row.IsNewRow -or -not $row.Tag) { continue }
+        if ([bool]$row.Cells[0].Value) { $ids += [string]$row.Tag.Id }
+    }
+    $script:StudioPlan.FetchModules = @(Sort-FastfetchModuleIds $ids)
+    $script:StudioPlan.FetchLook = Resolve-FastfetchLookId -Ids $script:StudioPlan.FetchModules
+    if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
+    Update-FastfetchCountLabel
+    Sync-LastLookCache
+    Update-StudioPreview
+}
+
+function Set-FastfetchRowToggle {
+    param($Row)
+    if (-not $Row -or $Row.IsNewRow -or -not $Row.Tag) { return }
+    $script:FetchGridLoading = $true
+    try {
+        $Row.Cells[0].Value = -not ([bool]$Row.Cells[0].Value)
+    } finally {
+        $script:FetchGridLoading = $false
+    }
+    Sync-FastfetchModulesFromGrid
+}
+
+function Update-LogoColorChips {
+    if (-not $script:LogoColorButtons) { return }
+    $c1 = Get-PlanLogoColor $script:StudioPlan 1 'cyan'
+    $c2 = Get-PlanLogoColor $script:StudioPlan 2 'blue'
+    $ck = Get-PlanKeyColor $script:StudioPlan 'blue'
+    foreach ($btn in @($script:LogoColorButtons)) {
+        if (-not $btn -or -not $btn.Tag) { continue }
+        $slot = [int]$btn.Tag.Slot
+        $name = [string]$btn.Tag.Name
+        $sel = switch ($slot) {
+            1 { $c1 }
+            2 { $c2 }
+            default { $ck }
+        }
+        $on = ($name -eq $sel)
+        $btn.FlatAppearance.BorderSize = $(if ($on) { 3 } else { 1 })
+        $btn.FlatAppearance.BorderColor = $(if ($on) { [System.Drawing.Color]::White } else { [System.Drawing.Color]::FromArgb(70, 70, 80) })
+    }
+}
+
 function Show-ChoiceStudio {
     param($Plan)
 
@@ -1791,104 +2282,183 @@ function Show-ChoiceStudio {
     if (-not $Plan.Art) { $Plan.Art = $arts[0] }
     if (-not $Plan.Posh) { $Plan.Posh = $poshItems[0] }
 
+    $script:StudioReady = $false
     $script:StudioPlan = $Plan
     $script:StudioResult = 'cancel'
 
+    $t = Get-StudioTheme
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Better Terminal — pick from the list'
-    $form.Size = New-Object System.Drawing.Size(1000, 820)
-    $form.MinimumSize = New-Object System.Drawing.Size(880, 720)
+    $form.Text = 'Better Terminal'
+    $form.Size = New-Object System.Drawing.Size(1180, 1000)
+    $form.MinimumSize = New-Object System.Drawing.Size(1020, 820)
     $form.StartPosition = 'CenterScreen'
     $form.TopMost = $true
-    $form.BackColor = [System.Drawing.Color]::FromArgb(22, 22, 28)
-    $form.ForeColor = [System.Drawing.Color]::White
+    $form.BackColor = $t.Bg
+    $form.ForeColor = $t.Text
     $form.Font = New-Object System.Drawing.Font('Segoe UI', 10)
+    $form.KeyPreview = $true
+    Enable-StudioDoubleBuffer $form
 
-    $header = New-Object System.Windows.Forms.Label
+    $header = New-Object System.Windows.Forms.Panel
     $header.Dock = 'Top'
-    $header.Height = 52
+    $header.Height = 78
+    $header.BackColor = $t.Surface
+
+    $titleLabel = New-Object System.Windows.Forms.Label
+    $titleLabel.Location = New-Object System.Drawing.Point(20, 12)
+    $titleLabel.AutoSize = $true
+    $titleLabel.Text = 'Better Terminal'
+    $titleLabel.Font = New-Object System.Drawing.Font('Segoe UI', 16, [System.Drawing.FontStyle]::Bold)
+    $titleLabel.ForeColor = $t.Text
+    $titleLabel.BackColor = $t.Surface
+
+    $subLabel = New-Object System.Windows.Forms.Label
+    $subLabel.Location = New-Object System.Drawing.Point(22, 44)
+    $subLabel.AutoSize = $true
     if ($script:RestoredLastLook) {
-        $header.Text = "  Your last look is already selected. Change only the tab you want, then Use this look.`r`n  $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts. Search clears when you change tabs."
+        $subLabel.Text = "Your last look is already selected. Change only what you want, then Use this look.  $($themes.Count) colors  ·  $($fonts.Count) fonts  ·  $($arts.Count) art  ·  $(@(Get-FastfetchModuleCatalog).Count) Fastfetch lines  ·  $($poshItems.Count) prompts"
     } else {
-        $header.Text = "  Everything is already downloaded. $($themes.Count) colors, $($fonts.Count) fonts, $($arts.Count) Fastfetch logos, $($poshItems.Count) prompts.`r`n  Search clears when you change tabs."
+        $subLabel.Text = "Click a tab, watch the preview, then Use this look.  $($themes.Count) colors  ·  $($fonts.Count) fonts  ·  $($arts.Count) art  ·  $(@(Get-FastfetchModuleCatalog).Count) Fastfetch lines  ·  $($poshItems.Count) prompts"
     }
-    $header.TextAlign = 'MiddleLeft'
-    $header.BackColor = [System.Drawing.Color]::FromArgb(36, 38, 52)
-    $header.Font = New-Object System.Drawing.Font('Segoe UI', 11)
+    $subLabel.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $subLabel.ForeColor = $t.Muted
+    $subLabel.BackColor = $t.Surface
+    $header.Controls.Add($titleLabel)
+    $header.Controls.Add($subLabel)
+
+    $footer = New-Object System.Windows.Forms.Panel
+    $footer.Dock = 'Bottom'
+    $footer.Height = 72
+    $footer.BackColor = $t.Surface
 
     $picks = New-Object System.Windows.Forms.Label
-    $picks.Dock = 'Bottom'
-    $picks.Height = 28
+    $picks.Location = New-Object System.Drawing.Point(20, 0)
+    $picks.Size = New-Object System.Drawing.Size(700, 72)
+    $picks.Anchor = 'Top,Bottom,Left,Right'
     $picks.TextAlign = 'MiddleLeft'
-    $picks.BackColor = [System.Drawing.Color]::FromArgb(28, 28, 36)
-    $picks.Padding = New-Object System.Windows.Forms.Padding(10, 0, 0, 0)
+    $picks.ForeColor = $t.Muted
+    $picks.BackColor = $t.Surface
+    $picks.Font = New-Object System.Drawing.Font('Segoe UI', 9)
 
-    $buttons = New-Object System.Windows.Forms.Panel
-    $buttons.Dock = 'Bottom'
-    $buttons.Height = 64
-    $buttons.BackColor = [System.Drawing.Color]::FromArgb(28, 28, 36)
-
-    $ok = New-Object System.Windows.Forms.Button
-    $ok.Text = 'Use this look'
-    $ok.Size = New-Object System.Drawing.Size(160, 38)
-    $ok.Location = New-Object System.Drawing.Point(20, 12)
-    $ok.BackColor = [System.Drawing.Color]::FromArgb(88, 166, 120)
-    $ok.ForeColor = [System.Drawing.Color]::White
-    $ok.FlatStyle = 'Flat'
+    $ok = New-StudioButton -Text 'Use this look' -Kind 'primary' -Width 168 -Height 40
+    $ok.Anchor = 'Top,Right'
+    $ok.Location = New-Object System.Drawing.Point(890, 16)
     $ok.Add_Click({
+        $script:StudioReady = $true
+        Save-LastLook -Plan $script:StudioPlan
         $script:StudioResult = 'ok'
         Close-PreviewPopup
         $script:StudioForm.Close()
     })
 
-    $cancel = New-Object System.Windows.Forms.Button
-    $cancel.Text = 'Cancel'
-    $cancel.Size = New-Object System.Drawing.Size(120, 38)
-    $cancel.Location = New-Object System.Drawing.Point(196, 12)
-    $cancel.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 80)
-    $cancel.ForeColor = [System.Drawing.Color]::White
-    $cancel.FlatStyle = 'Flat'
+    $cancel = New-StudioButton -Text 'Cancel' -Kind 'ghost' -Width 120 -Height 40
+    $cancel.Anchor = 'Top,Right'
+    $cancel.Location = New-Object System.Drawing.Point(758, 16)
     $cancel.Add_Click({
         $script:StudioResult = 'cancel'
         $script:StudioForm.Close()
     })
 
-    $buttons.Controls.Add($ok)
-    $buttons.Controls.Add($cancel)
+    $footer.Controls.Add($picks)
+    $footer.Controls.Add($ok)
+    $footer.Controls.Add($cancel)
+    $footer.Add_Resize({
+        if (-not $script:StudioOkButton -or -not $script:StudioCancelButton) { return }
+        $script:StudioOkButton.Left = [Math]::Max(200, $this.ClientSize.Width - $script:StudioOkButton.Width - 20)
+        $script:StudioCancelButton.Left = $script:StudioOkButton.Left - $script:StudioCancelButton.Width - 12
+        if ($script:StudioUi -and $script:StudioUi.Picks) {
+            $script:StudioUi.Picks.Width = [Math]::Max(120, $script:StudioCancelButton.Left - 28)
+        }
+    })
+
+    $form.AcceptButton = $ok
+    $form.CancelButton = $cancel
 
     $tabs = New-Object System.Windows.Forms.TabControl
     $tabs.Dock = 'Fill'
     $tabs.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+    $tabs.Appearance = 'FlatButtons'
+    $tabs.SizeMode = 'Fixed'
+    $tabs.ItemSize = New-Object System.Drawing.Size(0, 1)
+    $tabs.Multiline = $true
+    $tabs.DrawMode = 'Normal'
+    $tabs.Padding = New-Object System.Drawing.Point(0, 0)
+    Enable-StudioDoubleBuffer $tabs
 
-    $darkPage = [System.Drawing.Color]::FromArgb(18, 18, 22)
-    $darkText = [System.Drawing.Color]::FromArgb(230, 232, 240)
+    $tabBar = New-Object System.Windows.Forms.Panel
+    $tabBar.Dock = 'Top'
+    $tabBar.Height = 52
+    $tabBar.BackColor = $t.Surface
+    $tabBar.Padding = New-Object System.Windows.Forms.Padding(16, 8, 16, 8)
+
+    $tabFlow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $tabFlow.Dock = 'Fill'
+    $tabFlow.WrapContents = $false
+    $tabFlow.BackColor = $t.Surface
+    $tabFlow.Padding = New-Object System.Windows.Forms.Padding(0, 0, 0, 0)
+
+    $script:StudioTabButtons = @()
+    foreach ($tabName in @('Colors', 'Fonts', 'Art', 'Fastfetch', 'Prompt', 'Transparency')) {
+        $tabBtn = New-Object System.Windows.Forms.Button
+        $tabBtn.Text = $tabName
+        $tabBtn.Tag = $tabName
+        $tabBtn.AutoSize = $true
+        $tabBtn.MinimumSize = New-Object System.Drawing.Size(96, 34)
+        $tabBtn.Margin = New-Object System.Windows.Forms.Padding(0, 0, 8, 0)
+        $tabBtn.Padding = New-Object System.Windows.Forms.Padding(14, 4, 14, 4)
+        $tabBtn.FlatStyle = 'Flat'
+        $tabBtn.FlatAppearance.BorderSize = 1
+        $tabBtn.UseVisualStyleBackColor = $false
+        $tabBtn.UseMnemonic = $false
+        $tabBtn.Cursor = [System.Windows.Forms.Cursors]::Hand
+        $tabBtn.TextAlign = 'MiddleCenter'
+        $tabBtn.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+        $tabBtn.BackColor = [System.Drawing.Color]::FromArgb(28, 32, 42)
+        $tabBtn.ForeColor = [System.Drawing.Color]::FromArgb(210, 214, 228)
+        $tabBtn.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(46, 50, 66)
+        $tabBtn.Add_Click({
+            param($s, $e)
+            Select-StudioTab -Name ([string]$s.Tag)
+        })
+        $tabFlow.Controls.Add($tabBtn)
+        $script:StudioTabButtons += $tabBtn
+    }
+    $tabBar.Controls.Add($tabFlow)
+
+    $darkPage = $t.GridBg
+    $darkText = $t.Text
 
     $themeTab = New-Object System.Windows.Forms.TabPage
     $themeTab.Text = 'Colors'
     $fontTab = New-Object System.Windows.Forms.TabPage
     $fontTab.Text = 'Fonts'
     $artTab = New-Object System.Windows.Forms.TabPage
-    $artTab.Text = 'Fastfetch'
+    $artTab.Text = 'Art'
+    $fetchTab = New-Object System.Windows.Forms.TabPage
+    $fetchTab.Text = 'Fastfetch'
     $poshTab = New-Object System.Windows.Forms.TabPage
     $poshTab.Text = 'Prompt'
     $glassTab = New-Object System.Windows.Forms.TabPage
     $glassTab.Text = 'Transparency'
-    foreach ($page in @($themeTab, $fontTab, $artTab, $poshTab, $glassTab)) {
+    foreach ($page in @($themeTab, $fontTab, $artTab, $fetchTab, $poshTab, $glassTab)) {
         $page.UseVisualStyleBackColor = $false
         $page.BackColor = $darkPage
         $page.ForeColor = $darkText
+        $page.Padding = New-Object System.Windows.Forms.Padding(8, 8, 8, 8)
     }
 
     $themeGrid = New-ClickTable
     [void]$themeGrid.Columns.Add('Name', 'Theme')
     [void]$themeGrid.Columns.Add('Shade', 'Dark / Light')
-    foreach ($t in $themes) {
-        $i = $themeGrid.Rows.Add($t.name, (Get-ThemeShade $t))
-        $themeGrid.Rows[$i].Tag = $t
+    foreach ($themeRow in $themes) {
+        $i = $themeGrid.Rows.Add($themeRow.name, (Get-ThemeShade $themeRow))
+        $themeGrid.Rows[$i].Tag = $themeRow
     }
     $themeGrid.Add_SelectionChanged({
+        if (-not $script:StudioReady) { return }
         if ($script:ThemeGrid.CurrentRow -and $script:ThemeGrid.CurrentRow.Tag) {
             $script:StudioPlan.Theme = $script:ThemeGrid.CurrentRow.Tag
+            Sync-LastLookCache
             Update-StudioPreview
         }
     })
@@ -1904,8 +2474,10 @@ function Show-ChoiceStudio {
         $fontGrid.Rows[$i].Tag = $f
     }
     $fontGrid.Add_SelectionChanged({
+        if (-not $script:StudioReady) { return }
         if ($script:FontGrid.CurrentRow -and $script:FontGrid.CurrentRow.Tag) {
             $script:StudioPlan.Font = $script:FontGrid.CurrentRow.Tag
+            Sync-LastLookCache
             Update-StudioPreview
         }
     })
@@ -1927,12 +2499,247 @@ function Show-ChoiceStudio {
         $artGrid.Rows[$i].Tag = $a
     }
     $artGrid.Add_SelectionChanged({
+        if (-not $script:StudioReady) { return }
         if ($script:ArtGrid.CurrentRow -and $script:ArtGrid.CurrentRow.Tag) {
             $script:StudioPlan.Art = $script:ArtGrid.CurrentRow.Tag
+            Sync-LastLookCache
             Update-StudioPreview
         }
+        Update-CustomArtButtons
     })
+
+    $artBar = New-Object System.Windows.Forms.Panel
+    $artBar.Dock = 'Top'
+    $artBar.Height = 48
+    $artBar.BackColor = $t.Surface2
+
+    $addArt = New-StudioButton -Text 'Add my art' -Kind 'primary' -Width 118 -Height 30
+    $addArt.Location = New-Object System.Drawing.Point(8, 9)
+    $addArt.Add_Click({
+        $draft = Show-AddCustomArtDialog
+        if (-not $draft) { return }
+        $entry = New-CustomAsciiArt -Label $draft.Label -Lines $draft.Lines
+        if (-not $entry) { return }
+        $grid = $script:ArtGrid
+        if (-not $grid) { return }
+        $existingRow = $null
+        foreach ($row in $grid.Rows) {
+            if ($row.Tag -and [string]$row.Tag.Id -eq [string]$entry.Id) { $existingRow = $row; break }
+        }
+        if ($existingRow) {
+            $existingRow.Tag = $entry
+            $existingRow.Cells[0].Value = $entry.Label
+            $existingRow.Cells[1].Value = Get-ArtSnippet $entry
+        } else {
+            [void]$grid.Rows.Insert(0)
+            $grid.Rows[0].Cells[0].Value = $entry.Label
+            $grid.Rows[0].Cells[1].Value = Get-ArtSnippet $entry
+            $grid.Rows[0].Tag = $entry
+        }
+        $script:StudioPlan.Art = $entry
+        if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
+        Select-StudioGridRow -Grid $grid -Wanted $entry -Properties @('Id')
+        Update-CustomArtButtons
+        Sync-LastLookCache
+        Update-StudioPreview
+    })
+
+    $removeArt = New-StudioButton -Text 'Remove' -Kind 'ghost' -Width 88 -Height 30
+    $removeArt.Location = New-Object System.Drawing.Point(134, 9)
+    $removeArt.Enabled = $false
+    $removeArt.Add_Click({
+        $art = $null
+        if ($script:StudioPlan) { $art = $script:StudioPlan.Art }
+        if (-not $art -or [string]$art.Kind -ne 'custom') { return }
+        $ask = [System.Windows.Forms.MessageBox]::Show(
+            "Remove '$($art.Label)' from your ASCII list?",
+            'Remove my art',
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Question
+        )
+        if ($ask -ne [System.Windows.Forms.DialogResult]::Yes) { return }
+        if (-not (Remove-CustomAsciiArt $art)) { return }
+        $grid = $script:ArtGrid
+        if ($grid) {
+            foreach ($row in @($grid.Rows)) {
+                if ($row.Tag -and [string]$row.Tag.Id -eq [string]$art.Id) {
+                    $grid.Rows.Remove($row)
+                    break
+                }
+            }
+            if ($grid.Rows.Count -gt 0) {
+                Select-StudioGridRow -Grid $grid -Wanted $grid.Rows[0].Tag -Properties @('Id', 'Label')
+            }
+        }
+        if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
+        Update-CustomArtButtons
+        Sync-LastLookCache
+        Update-StudioPreview
+    })
+
+    $artHint = New-Object System.Windows.Forms.Label
+    $artHint.Text = 'Name your own picture. It stays on this PC.'
+    $artHint.Location = New-Object System.Drawing.Point(232, 15)
+    $artHint.AutoSize = $true
+    $artHint.ForeColor = $t.Muted
+    $artHint.BackColor = $t.Surface2
+
+    $artBar.Controls.Add($addArt)
+    $artBar.Controls.Add($removeArt)
+    $artBar.Controls.Add($artHint)
     $artTab.Controls.Add($artGrid)
+    $artTab.Controls.Add($artBar)
+    $script:RemoveArtButton = $removeArt
+
+    $fetchGrid = New-ClickTable
+    $fetchGrid.ReadOnly = $false
+    $fetchGrid.RowTemplate.Height = 30
+
+    $onColumn = New-Object System.Windows.Forms.DataGridViewCheckBoxColumn
+    $onColumn.HeaderText = 'On'
+    $onColumn.FillWeight = 9
+    $onColumn.Resizable = 'False'
+    [void]$fetchGrid.Columns.Add($onColumn)
+
+    $lineColumn = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+    $lineColumn.HeaderText = 'Info line'
+    $lineColumn.ReadOnly = $true
+    $lineColumn.FillWeight = 32
+    [void]$fetchGrid.Columns.Add($lineColumn)
+
+    $noteColumn = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
+    $noteColumn.HeaderText = 'What it shows'
+    $noteColumn.ReadOnly = $true
+    $noteColumn.FillWeight = 59
+    [void]$fetchGrid.Columns.Add($noteColumn)
+
+    foreach ($mod in @(Get-FastfetchModuleCatalog)) {
+        $i = $fetchGrid.Rows.Add($false, $mod.Label, $mod.Note)
+        $fetchGrid.Rows[$i].Tag = $mod
+    }
+
+    $fetchGrid.Add_CurrentCellDirtyStateChanged({
+        if ($script:FetchGrid -and $script:FetchGrid.IsCurrentCellDirty) {
+            $script:FetchGrid.CommitEdit([System.Windows.Forms.DataGridViewDataErrorContexts]::Commit)
+        }
+    })
+    $fetchGrid.Add_CellValueChanged({
+        param($s, $e)
+        if (-not $script:StudioReady -or $script:FetchGridLoading) { return }
+        if ($e.ColumnIndex -ne 0 -or $e.RowIndex -lt 0) { return }
+        Sync-FastfetchModulesFromGrid
+    })
+    $fetchGrid.Add_CellClick({
+        param($s, $e)
+        if (-not $script:StudioReady -or $script:FetchGridLoading) { return }
+        if ($e.RowIndex -lt 0 -or $e.ColumnIndex -lt 1) { return }
+        Set-FastfetchRowToggle $s.Rows[$e.RowIndex]
+    })
+
+    $fetchBar = New-Object System.Windows.Forms.Panel
+    $fetchBar.Dock = 'Top'
+    $fetchBar.Height = 112
+    $fetchBar.BackColor = $t.Surface2
+
+    $script:LogoColorButtons = @()
+    $colorRows = @(
+        @{ Slot = 1; Y = 8;  Caption = 'Picture color' }
+        @{ Slot = 2; Y = 38; Caption = 'Picture 2nd color' }
+        @{ Slot = 3; Y = 68; Caption = 'Info text color' }
+    )
+    foreach ($row in $colorRows) {
+        $caption = New-Object System.Windows.Forms.Label
+        $caption.Text = [string]$row.Caption
+        $caption.Location = New-Object System.Drawing.Point(12, ([int]$row.Y + 4))
+        $caption.Size = New-Object System.Drawing.Size(132, 20)
+        $caption.ForeColor = $t.Text
+        $caption.BackColor = $t.Surface2
+        $caption.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Bold)
+        $fetchBar.Controls.Add($caption)
+
+        $x = 150
+        foreach ($name in @(Get-FastfetchLogoColorNames)) {
+            $chip = New-Object System.Windows.Forms.Button
+            $chip.Location = New-Object System.Drawing.Point($x, ([int]$row.Y))
+            $chip.Size = New-Object System.Drawing.Size(26, 26)
+            $chip.FlatStyle = 'Flat'
+            $chip.Cursor = [System.Windows.Forms.Cursors]::Hand
+            $chip.BackColor = Get-FastfetchLogoChipColor $name
+            $chip.ForeColor = $chip.BackColor
+            $chip.Text = ''
+            $chip.Tag = [pscustomobject]@{ Slot = [int]$row.Slot; Name = $name }
+            $chip.Add_Click({
+                if (-not $script:StudioReady -or -not $this.Tag) { return }
+                switch ([int]$this.Tag.Slot) {
+                    1 { $script:StudioPlan.LogoColor1 = [string]$this.Tag.Name }
+                    2 { $script:StudioPlan.LogoColor2 = [string]$this.Tag.Name }
+                    default { $script:StudioPlan.KeyColor = [string]$this.Tag.Name }
+                }
+                Update-LogoColorChips
+                if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
+                Sync-LastLookCache
+                Update-StudioPreview
+            })
+            $fetchBar.Controls.Add($chip)
+            $script:LogoColorButtons += $chip
+            $x += 28
+        }
+
+        $what = New-Object System.Windows.Forms.Label
+        $what.Text = switch ([int]$row.Slot) {
+            1 { 'the drawing on the left' }
+            2 { 'the second shade of that drawing' }
+            default { 'the OS, CPU, Memory labels' }
+        }
+        $what.Location = New-Object System.Drawing.Point(388, ([int]$row.Y + 5))
+        $what.AutoSize = $true
+        $what.ForeColor = $t.Muted
+        $what.BackColor = $t.Surface2
+        $fetchBar.Controls.Add($what)
+    }
+
+    $quickLabel = New-Object System.Windows.Forms.Label
+    $quickLabel.Text = 'Quick sets'
+    $quickLabel.Location = New-Object System.Drawing.Point(640, 12)
+    $quickLabel.AutoSize = $true
+    $quickLabel.ForeColor = $t.Text
+    $quickLabel.BackColor = $t.Surface2
+    $quickLabel.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Bold)
+    $fetchBar.Controls.Add($quickLabel)
+
+    $quickFlow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $quickFlow.Location = New-Object System.Drawing.Point(638, 34)
+    $quickFlow.Size = New-Object System.Drawing.Size(300, 72)
+    $quickFlow.BackColor = $t.Surface2
+    $quickFlow.WrapContents = $true
+    foreach ($look in @(Get-FastfetchLookCatalog)) {
+        $preset = New-StudioButton -Text ([string]$look.Label) -Kind 'ghost' -Width 92 -Height 30
+        $preset.Tag = $look
+        $preset.Margin = New-Object System.Windows.Forms.Padding(0, 0, 6, 6)
+        $preset.Add_Click({
+            if (-not $script:StudioReady -or -not $this.Tag) { return }
+            Set-PlanFastfetchLook $this.Tag
+            Update-FastfetchGridChecks
+            if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
+            Sync-LastLookCache
+            Update-StudioPreview
+        })
+        $quickFlow.Controls.Add($preset)
+    }
+    $fetchBar.Controls.Add($quickFlow)
+
+    $fetchCount = New-Object System.Windows.Forms.Label
+    $fetchCount.Text = ''
+    $fetchCount.Location = New-Object System.Drawing.Point(950, 12)
+    $fetchCount.AutoSize = $true
+    $fetchCount.ForeColor = $t.Success
+    $fetchCount.BackColor = $t.Surface2
+    $fetchCount.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Bold)
+    $fetchBar.Controls.Add($fetchCount)
+    $script:FetchCountLabel = $fetchCount
+
+    $fetchTab.Controls.Add($fetchGrid)
+    $fetchTab.Controls.Add($fetchBar)
 
     $poshGrid = New-ClickTable
     $poshGrid.RowTemplate.Height = 38
@@ -1944,8 +2751,10 @@ function Show-ChoiceStudio {
         $poshGrid.Rows[$i].Tag = $p
     }
     $poshGrid.Add_SelectionChanged({
+        if (-not $script:StudioReady) { return }
         if ($script:PoshGrid.CurrentRow -and $script:PoshGrid.CurrentRow.Tag) {
             $script:StudioPlan.Posh = $script:PoshGrid.CurrentRow.Tag
+            Sync-LastLookCache
             Update-StudioPreview
         }
     })
@@ -1961,47 +2770,66 @@ function Show-ChoiceStudio {
     $glassWrap = New-Object System.Windows.Forms.Panel
     $glassWrap.Dock = 'Fill'
     $glassWrap.BackColor = $darkPage
-    $glassWrap.Padding = New-Object System.Windows.Forms.Padding(16)
-
-    $glassHelp = New-Object System.Windows.Forms.Label
-    $glassHelp.Dock = 'Top'
-    $glassHelp.Height = 70
-    $glassHelp.ForeColor = $darkText
-    $glassHelp.BackColor = $darkPage
-    $glassHelp.Font = New-Object System.Drawing.Font('Segoe UI', 11)
-    $glassHelp.Text = "Transparency: how solid should the window be? Drag from 0 to 100.`r`n0 = wallpaper shows through.  50 = half glass.  100 = fully solid.`r`nSearch 80 to jump the slider. The small terminal shows the look."
-    $glassHelp.TextAlign = 'MiddleLeft'
+    $glassWrap.Padding = New-Object System.Windows.Forms.Padding(20, 18, 20, 16)
 
     $glassPct = New-Object System.Windows.Forms.Label
     $glassPct.Dock = 'Top'
-    $glassPct.Height = 48
-    $glassPct.ForeColor = [System.Drawing.Color]::FromArgb(120, 200, 140)
+    $glassPct.Height = 44
+    $glassPct.ForeColor = $t.Success
     $glassPct.BackColor = $darkPage
     $glassPct.Font = New-Object System.Drawing.Font('Segoe UI', 22, [System.Drawing.FontStyle]::Bold)
-    $glassPct.Text = "$([int]$Plan.Opacity)% solid"
+    $glassPct.Text = "$([int]$Plan.Opacity)%"
     $glassPct.TextAlign = 'MiddleLeft'
 
     $slideBox = New-Object System.Windows.Forms.Panel
     $slideBox.Dock = 'Top'
-    $slideBox.Height = 96
+    $slideBox.Height = 64
     $slideBox.BackColor = $darkPage
+
+    $script:GlassValue = [Math]::Min(100, [Math]::Max(0, [int]$Plan.Opacity))
 
     $tickBar = New-Object System.Windows.Forms.Panel
     $tickBar.Dock = 'Bottom'
-    $tickBar.Height = 22
+    $tickBar.Height = 24
     $tickBar.BackColor = $darkPage
+    $tickBar.Cursor = [System.Windows.Forms.Cursors]::Hand
+    Enable-StudioDoubleBuffer $tickBar
 
-    $slider = New-Object System.Windows.Forms.TrackBar
+    $slider = New-Object System.Windows.Forms.Panel
     $slider.Dock = 'Fill'
-    $slider.Minimum = 0
-    $slider.Maximum = 100
-    $slider.TickFrequency = 10
-    $slider.SmallChange = 1
-    $slider.LargeChange = 10
-    $slider.TickStyle = 'BottomRight'
-    $slider.Value = [Math]::Min(100, [Math]::Max(0, [int]$Plan.Opacity))
     $slider.BackColor = $darkPage
-    $slider.AutoSize = $false
+    $slider.Cursor = [System.Windows.Forms.Cursors]::Hand
+    Enable-StudioDoubleBuffer $slider
+
+    $script:GlassTrack = $slider
+    $script:GlassSlider = $slider
+    $script:GlassTicks = $tickBar
+    $script:GlassDragging = $false
+
+    $slider.Add_Paint({
+        param($s, $e)
+        Draw-GlassTrack -Surface $s -Graphics $e.Graphics
+    })
+    $slider.Add_MouseDown({
+        param($s, $e)
+        $script:GlassDragging = $true
+        Set-StudioOpacity (Get-GlassValueAtX -X $e.X -Width $s.ClientSize.Width)
+    })
+    $slider.Add_MouseMove({
+        param($s, $e)
+        if (-not $script:GlassDragging) { return }
+        Set-StudioOpacity (Get-GlassValueAtX -X $e.X -Width $s.ClientSize.Width)
+    })
+    $slider.Add_MouseUp({ $script:GlassDragging = $false })
+
+    $tickBar.Add_Paint({
+        param($s, $e)
+        Draw-GlassTickScale -Surface $s -Graphics $e.Graphics
+    })
+    $tickBar.Add_MouseDown({
+        param($s, $e)
+        Set-StudioOpacity (Get-GlassSnapValue -X $e.X -Width $s.ClientSize.Width)
+    })
 
     $slideBox.Controls.Add($slider)
     $slideBox.Controls.Add($tickBar)
@@ -2017,74 +2845,97 @@ function Show-ChoiceStudio {
     $blur.Font = New-Object System.Drawing.Font('Segoe UI', 11)
 
     $script:GlassPct = $glassPct
-    $script:GlassTicks = $tickBar
-    $slider.Add_ValueChanged({
-        $script:StudioPlan.Opacity = $script:GlassSlider.Value
-        if ($script:GlassPct) { $script:GlassPct.Text = "$($script:GlassSlider.Value)% solid" }
-        Update-StudioPreview
-    })
     $blur.Add_CheckedChanged({
+        if (-not $script:StudioReady) { return }
         $script:StudioPlan.UseAcrylic = $script:GlassBlur.Checked
+        Sync-LastLookCache
         Update-StudioPreview
     })
     $glassWrap.Controls.Add($blur)
     $glassWrap.Controls.Add($slideBox)
     $glassWrap.Controls.Add($glassPct)
-    $glassWrap.Controls.Add($glassHelp)
     $glassTab.Controls.Add($glassWrap)
 
     [void]$tabs.TabPages.Add($themeTab)
     [void]$tabs.TabPages.Add($fontTab)
     [void]$tabs.TabPages.Add($artTab)
+    [void]$tabs.TabPages.Add($fetchTab)
     [void]$tabs.TabPages.Add($poshTab)
     [void]$tabs.TabPages.Add($glassTab)
 
     $searchBar = New-Object System.Windows.Forms.Panel
     $searchBar.Dock = 'Top'
-    $searchBar.Height = 44
-    $searchBar.BackColor = [System.Drawing.Color]::FromArgb(28, 28, 36)
+    $searchBar.Height = 86
+    $searchBar.BackColor = $t.Surface
 
-    $searchLabel = New-Object System.Windows.Forms.Label
-    $searchLabel.Text = 'Search'
-    $searchLabel.Location = New-Object System.Drawing.Point(12, 12)
-    $searchLabel.AutoSize = $true
-    $searchLabel.ForeColor = [System.Drawing.Color]::FromArgb(200, 210, 230)
+    $guide = New-Object System.Windows.Forms.Label
+    $guide.Location = New-Object System.Drawing.Point(20, 8)
+    $guide.AutoSize = $true
+    $guide.Text = Get-StudioTabGuide
+    $guide.ForeColor = $t.Text
+    $guide.BackColor = $t.Surface
+    $guide.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+
+    $searchShell = New-Object System.Windows.Forms.Panel
+    $searchShell.Location = New-Object System.Drawing.Point(20, 38)
+    $searchShell.Size = New-Object System.Drawing.Size(520, 36)
+    $searchShell.BackColor = $t.Surface2
+    $searchShell.Padding = New-Object System.Windows.Forms.Padding(10, 7, 10, 6)
 
     $searchBox = New-Object System.Windows.Forms.TextBox
-    $searchBox.Location = New-Object System.Drawing.Point(68, 9)
-    $searchBox.Width = 420
+    $searchBox.Dock = 'Fill'
+    $searchBox.BorderStyle = 'None'
+    $searchBox.BackColor = $t.Surface2
+    $searchBox.ForeColor = $t.Text
+    $searchBox.Font = New-Object System.Drawing.Font('Segoe UI', 10)
     $searchBox.Text = ''
 
-    $find = New-Object System.Windows.Forms.Button
-    $find.Text = 'Find'
-    $find.Location = New-Object System.Drawing.Point(500, 7)
-    $find.Size = New-Object System.Drawing.Size(70, 26)
-    $find.FlatStyle = 'Flat'
-    $find.BackColor = [System.Drawing.Color]::FromArgb(70, 70, 80)
-    $find.ForeColor = [System.Drawing.Color]::White
+    $searchCue = New-Object System.Windows.Forms.Label
+    $searchCue.Text = Get-StudioSearchCue
+    $searchCue.Location = New-Object System.Drawing.Point(32, 46)
+    $searchCue.AutoSize = $true
+    $searchCue.ForeColor = $t.Muted
+    $searchCue.BackColor = $t.Surface2
+    $searchCue.Cursor = [System.Windows.Forms.Cursors]::IBeam
+    $searchCue.Add_Click({ if ($script:StudioSearch) { $script:StudioSearch.Focus() } })
 
-    $searchHint = New-Object System.Windows.Forms.Label
-    $searchHint.Text = 'clears when you change tabs'
-    $searchHint.Location = New-Object System.Drawing.Point(580, 12)
-    $searchHint.AutoSize = $true
-    $searchHint.ForeColor = [System.Drawing.Color]::FromArgb(140, 150, 168)
+    $clearSearch = New-StudioButton -Text 'Clear' -Kind 'ghost' -Width 72 -Height 32
+    $clearSearch.Location = New-Object System.Drawing.Point(548, 40)
+    $clearSearch.Add_Click({
+        if ($script:StudioSearch) { $script:StudioSearch.Text = '' }
+        Update-StudioSearch
+    })
 
-    $searchBar.Controls.Add($searchLabel)
-    $searchBar.Controls.Add($searchBox)
-    $searchBar.Controls.Add($find)
-    $searchBar.Controls.Add($searchHint)
+    $searchNote = New-Object System.Windows.Forms.Label
+    $searchNote.Text = 'Clears when you change tabs'
+    $searchNote.Location = New-Object System.Drawing.Point(632, 46)
+    $searchNote.AutoSize = $true
+    $searchNote.ForeColor = $t.Muted
+    $searchNote.BackColor = $t.Surface
 
-    $find.Add_Click({ Update-StudioSearch })
+    $searchShell.Controls.Add($searchBox)
+    $searchBar.Controls.Add($guide)
+    $searchBar.Controls.Add($searchShell)
+    $searchBar.Controls.Add($searchCue)
+    $searchBar.Controls.Add($clearSearch)
+    $searchBar.Controls.Add($searchNote)
+    $searchCue.BringToFront()
+
     $searchBox.Add_TextChanged({ Update-StudioSearch })
+    $searchBox.Add_GotFocus({ if ($script:StudioSearchCue) { $script:StudioSearchCue.Visible = $false } })
+    $searchBox.Add_LostFocus({ Update-StudioChrome })
     $searchBox.Add_KeyDown({
         param($s, $e)
-        if ($e.KeyCode -eq 'Enter') { Update-StudioSearch }
+        if ($e.KeyCode -eq 'Enter') {
+            $e.SuppressKeyPress = $true
+            Update-StudioSearch
+        }
     })
     $desktop = New-Object System.Windows.Forms.Panel
     $desktop.Dock = 'Top'
-    $desktop.Height = 390
-    $desktop.BackColor = [System.Drawing.Color]::FromArgb(88, 108, 142)
-    $desktop.Padding = New-Object System.Windows.Forms.Padding(10, 8, 10, 8)
+    $desktop.Height = 318
+    $desktop.BackColor = $t.Wall
+    $desktop.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 10)
 
     $preview = New-Object System.Windows.Forms.Panel
     $preview.Dock = 'Fill'
@@ -2096,8 +2947,8 @@ function Show-ChoiceStudio {
     $title.TextAlign = 'MiddleLeft'
     $title.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $title.ForeColor = [System.Drawing.Color]::FromArgb(200, 210, 230)
-    $title.Text = '  Your terminal'
-    $title.Font = New-Object System.Drawing.Font('Segoe UI', 11, [System.Drawing.FontStyle]::Bold)
+    $title.Text = '  Live preview'
+    $title.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
     $title.Padding = New-Object System.Windows.Forms.Padding(8, 0, 0, 0)
 
     $promptName = New-Object System.Windows.Forms.Label
@@ -2157,16 +3008,33 @@ function Show-ChoiceStudio {
     $desktop.Controls.Add($preview)
 
     $form.Controls.Add($tabs)
+    $form.Controls.Add($tabBar)
     $form.Controls.Add($searchBar)
     $form.Controls.Add($desktop)
-    $form.Controls.Add($buttons)
-    $form.Controls.Add($picks)
+    $form.Controls.Add($footer)
     $form.Controls.Add($header)
 
+    $tips = New-Object System.Windows.Forms.ToolTip
+    $tips.AutoPopDelay = 8000
+    $tips.InitialDelay = 400
+    $tips.SetToolTip($ok, 'Save this look to Windows Terminal and PowerShell')
+    $tips.SetToolTip($cancel, 'Close without applying')
+    $tips.SetToolTip($clearSearch, 'Clear the search box')
+    $tips.SetToolTip($addArt, 'Save your own ASCII picture')
+    $tips.SetToolTip($removeArt, 'Delete a picture you added')
+    foreach ($chip in @($script:LogoColorButtons)) {
+        if ($chip -and $chip.Tag) { $tips.SetToolTip($chip, [string]$chip.Tag.Name) }
+    }
+
     $script:StudioForm = $form
+    $script:StudioOkButton = $ok
+    $script:StudioCancelButton = $cancel
+    $script:StudioGuide = $guide
+    $script:StudioSearchCue = $searchCue
     $script:ThemeGrid = $themeGrid
     $script:FontGrid = $fontGrid
     $script:ArtGrid = $artGrid
+    $script:FetchGrid = $fetchGrid
     $script:PoshGrid = $poshGrid
     $script:StudioTabs = $tabs
     $script:StudioSearch = $searchBox
@@ -2175,6 +3043,7 @@ function Show-ChoiceStudio {
             $script:StudioSearch.Text = ''
         }
         Update-StudioSearch
+        Update-StudioChrome
     })
     $script:GlassSlider = $slider
     $script:GlassBlur = $blur
@@ -2192,17 +3061,50 @@ function Show-ChoiceStudio {
     }
 
     $form.Add_Shown({
-        $script:StudioForm.Activate()
-        $script:StudioForm.BringToFront()
-        Update-GlassTickLabels
-        Select-StudioGridRow -Grid $script:ThemeGrid -Wanted $script:StudioPlan.Theme -Properties @('name')
-        Select-StudioGridRow -Grid $script:FontGrid -Wanted $script:StudioPlan.Font -Properties @('Id', 'Label')
-        Select-StudioGridRow -Grid $script:ArtGrid -Wanted $script:StudioPlan.Art -Properties @('Id', 'Label')
-        Select-StudioGridRow -Grid $script:PoshGrid -Wanted $script:StudioPlan.Posh -Properties @('Id', 'Label')
-        Update-StudioPreview
+        try {
+            $script:StudioReady = $false
+            Restore-LastLookToPlan -Plan $script:StudioPlan | Out-Null
+            $script:StudioForm.Activate()
+            $script:StudioForm.BringToFront()
+            if ($null -ne $script:StudioPlan.Opacity) {
+                Set-StudioOpacity ([int]$script:StudioPlan.Opacity)
+            }
+            Update-GlassTickLabels
+            if ($script:GlassBlur -and $null -ne $script:StudioPlan.UseAcrylic) {
+                $script:GlassBlur.Checked = [bool]$script:StudioPlan.UseAcrylic
+            }
+            if ($script:GlassPct) { $script:GlassPct.Text = "$([int]$script:StudioPlan.Opacity)%" }
+            Select-StudioGridRow -Grid $script:ThemeGrid -Wanted $script:StudioPlan.Theme -Properties @('name')
+            Select-StudioGridRow -Grid $script:FontGrid -Wanted $script:StudioPlan.Font -Properties @('Id', 'Label', 'Face')
+            Select-StudioGridRow -Grid $script:ArtGrid -Wanted $script:StudioPlan.Art -Properties @('Id', 'Label')
+            Select-StudioGridRow -Grid $script:PoshGrid -Wanted $script:StudioPlan.Posh -Properties @('Id', 'Label')
+            Update-FastfetchGridChecks
+            Update-LogoColorChips
+            Update-StudioChrome
+            if ($script:StudioOkButton -and $script:StudioOkButton.Parent) {
+                $bar = $script:StudioOkButton.Parent
+                $script:StudioOkButton.Left = [Math]::Max(200, $bar.ClientSize.Width - $script:StudioOkButton.Width - 20)
+                if ($script:StudioCancelButton) {
+                    $script:StudioCancelButton.Left = $script:StudioOkButton.Left - $script:StudioCancelButton.Width - 12
+                }
+                if ($script:StudioUi -and $script:StudioUi.Picks) {
+                    $script:StudioUi.Picks.Width = [Math]::Max(120, $script:StudioCancelButton.Left - 28)
+                }
+            }
+            $script:StudioReady = $true
+            Update-CustomArtButtons
+            Update-StudioPreview
+        } catch {
+            $script:StudioReady = $true
+        }
     })
 
-    [void]$form.ShowDialog()
+    try {
+        [void]$form.ShowDialog()
+    } catch {
+        Write-Color "  The picker could not stay open: $($_.Exception.Message)" '#F38BA8'
+        return $null
+    }
 
     if ($script:StudioResult -ne 'ok') { return $null }
     return $script:StudioPlan
@@ -2404,6 +3306,122 @@ function Get-CatalogRoot {
     New-Item -ItemType Directory -Force -Path $path | Out-Null
     $script:CatalogRoot = $path
     return $path
+}
+
+function Get-CustomAsciiRoot {
+    $path = Join-Path (Get-CatalogRoot) 'custom-ascii'
+    New-Item -ItemType Directory -Force -Path $path | Out-Null
+    return $path
+}
+
+function Read-CustomAsciiIndex {
+    $path = Join-Path (Get-CustomAsciiRoot) 'index.json'
+    if (-not (Test-Path $path)) { return @() }
+    try {
+        $raw = Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($null -eq $raw) { return @() }
+        return @($raw)
+    } catch {
+        return @()
+    }
+}
+
+function Write-CustomAsciiIndex {
+    param($Items)
+    $path = Join-Path (Get-CustomAsciiRoot) 'index.json'
+    $json = if ($Items -and @($Items).Count -gt 0) {
+        (@($Items) | ConvertTo-Json -Depth 6)
+    } else {
+        '[]'
+    }
+    Write-Utf8NoBom -Path $path -Text $json
+}
+
+function New-CustomArtObject {
+    param($Id, $Label, [string[]]$Lines)
+    [pscustomobject]@{
+        Id       = [string]$Id
+        Category = 'My ASCII art'
+        Label    = [string]$Label
+        Kind     = 'custom'
+        Source   = 'user'
+        Lines    = @($Lines)
+    }
+}
+
+function Get-CustomAsciiCatalog {
+    $root = Get-CustomAsciiRoot
+    $list = @()
+    foreach ($item in @(Read-CustomAsciiIndex)) {
+        if (-not $item.File) { continue }
+        $file = Join-Path $root ([string]$item.File)
+        if (-not (Test-Path $file)) { continue }
+        $text = Get-Content -Path $file -Raw -Encoding UTF8
+        if ($null -eq $text) { $text = '' }
+        $lines = @($text -split "`r?`n")
+        if ($lines.Count -gt 0 -and [string]::IsNullOrEmpty($lines[$lines.Count - 1])) {
+            if ($lines.Count -eq 1) { $lines = @() } else { $lines = @($lines[0..($lines.Count - 2)]) }
+        }
+        $list += (New-CustomArtObject -Id $item.Id -Label $item.Label -Lines $lines)
+    }
+    return $list
+}
+
+function New-CustomAsciiArt {
+    param(
+        [string]$Label,
+        [string[]]$Lines
+    )
+    $name = if ($null -eq $Label) { '' } else { $Label.Trim() }
+    if ([string]::IsNullOrWhiteSpace($name)) { return $null }
+    $artLines = @($Lines)
+    if (-not ($artLines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) { return $null }
+
+    $root = Get-CustomAsciiRoot
+    $index = @(Read-CustomAsciiIndex)
+    $existing = @($index | Where-Object { [string]$_.Label -eq $name } | Select-Object -First 1)
+    if ($existing.Count -gt 0) {
+        $id = [string]$existing[0].Id
+        $fileName = [string]$existing[0].File
+        if ([string]::IsNullOrWhiteSpace($fileName)) { $fileName = "$id.txt" }
+    } else {
+        $base = ConvertTo-LogoId $name
+        if ([string]::IsNullOrWhiteSpace($base)) { $base = 'art' }
+        $id = "custom-$base"
+        $n = 2
+        while (@($index | Where-Object { $_.Id -eq $id }).Count -gt 0) {
+            $id = "custom-$base-$n"
+            $n++
+        }
+        $fileName = "$id.txt"
+        $index += [pscustomobject]@{ Id = $id; Label = $name; File = $fileName }
+    }
+
+    Write-Utf8NoBom -Path (Join-Path $root $fileName) -Text (($artLines -join "`n") + "`n")
+    Write-CustomAsciiIndex $index
+
+    $entry = New-CustomArtObject -Id $id -Label $name -Lines $artLines
+    if ($script:AllArts) {
+        $script:AllArts = @($entry) + @($script:AllArts | Where-Object { $_.Id -ne $id })
+    }
+    return $entry
+}
+
+function Remove-CustomAsciiArt {
+    param($Art)
+    if (-not $Art -or [string]$Art.Kind -ne 'custom') { return $false }
+    $root = Get-CustomAsciiRoot
+    $old = @((Read-CustomAsciiIndex) | Where-Object { $_.Id -eq $Art.Id } | Select-Object -First 1)
+    $index = @((Read-CustomAsciiIndex) | Where-Object { $_.Id -ne $Art.Id })
+    if ($old.Count -gt 0 -and $old[0].File) {
+        $file = Join-Path $root ([string]$old[0].File)
+        if (Test-Path $file) { Remove-Item -Path $file -Force -ErrorAction SilentlyContinue }
+    }
+    Write-CustomAsciiIndex $index
+    if ($script:AllArts) {
+        $script:AllArts = @($script:AllArts | Where-Object { $_.Id -ne $Art.Id })
+    }
+    return $true
 }
 
 function Get-ThemeColorValue {
@@ -2825,7 +3843,9 @@ function Import-AllFastfetchLogos {
 
     $script:AllArts = $null
     $builtIn = @(Get-AsciiCatalog)
-    $extras = @($builtIn | Where-Object { $_.Category -ne 'Official Fastfetch' })
+    $custom = @($builtIn | Where-Object { [string]$_.Kind -eq 'custom' })
+    $stock = @($builtIn | Where-Object { [string]$_.Kind -ne 'custom' })
+    $extras = @($stock | Where-Object { $_.Category -ne 'Official Fastfetch' })
     $auto = [pscustomobject]@{
         Id = 'windows-auto'; Category = 'Official Fastfetch'; Label = 'Auto (detect this PC)'; Kind = 'auto'; Source = ''; Lines = @('  Auto (detect this PC)')
     }
@@ -2833,7 +3853,7 @@ function Import-AllFastfetchLogos {
         Id = 'none'; Category = 'Official Fastfetch'; Label = 'No logo (info only)'; Kind = 'none'; Source = ''; Lines = @('  (no logo)')
     }
     if ($official.Count -eq 0 -and $front.Count -eq 0) {
-        $script:AllArts = @($builtIn)
+        $script:AllArts = @($custom + $stock)
     } else {
         $frontOrder = @('Windows 11', 'Windows11', 'Windows', 'Windows small', 'Windows_small')
         $frontSorted = @(
@@ -2842,7 +3862,7 @@ function Import-AllFastfetchLogos {
                 if ($idx -ge 0) { $idx } else { 50 }
             }
         )
-        $script:AllArts = @($frontSorted + @($auto, $none) + ($official | Sort-Object Label) + $extras)
+        $script:AllArts = @($custom + $frontSorted + @($auto, $none) + ($official | Sort-Object Label) + $extras)
     }
     foreach ($art in @($script:AllArts | Select-Object -First 6)) {
         if ($art.Kind -eq 'builtin' -or $art.Kind -eq 'small' -or $art.Kind -eq 'auto') {
@@ -2953,7 +3973,15 @@ function Get-ArtPreviewText {
 function Get-FastfetchFullPreview {
     param($Art)
     if (-not $Art) { return '  Fastfetch will show here.' }
-    $key = 'full|{0}|{1}|{2}' -f $Art.Kind, $Art.Id, $Art.Source
+    $modKey = ''
+    $colorKey = ''
+    if ($script:StudioPlan) {
+        $modKey = ((Get-PlanFastfetchModuleIds $script:StudioPlan) -join ',')
+        $colorKey = '{0}/{1}/{2}' -f (Get-PlanLogoColor $script:StudioPlan 1 'cyan'),
+            (Get-PlanLogoColor $script:StudioPlan 2 'blue'),
+            (Get-PlanKeyColor $script:StudioPlan 'blue')
+    }
+    $key = 'full|{0}|{1}|{2}|{3}|{4}' -f $Art.Kind, $Art.Id, $Art.Source, $modKey, $colorKey
     if ($script:FetchPreviewCache -and $script:FetchPreviewCache.ContainsKey($key)) {
         return $script:FetchPreviewCache[$key]
     }
@@ -2961,25 +3989,44 @@ function Get-FastfetchFullPreview {
 
     $text = $null
     if (Test-CommandExists 'fastfetch') {
-        $ffArgs = @('--config', 'none', '--pipe')
+        $ffArgs = @('--pipe')
         $kind = [string]$Art.Kind
         $name = if ($Art.Source) { [string]$Art.Source } else { [string]$Art.Label }
+        $previewCfg = Join-Path $env:TEMP 'better-terminal-preview-fastfetch.jsonc'
+        $logoType = 'auto'
+        $logoSource = $null
+        $logoFile = $null
         if ($Art.Id -eq 'none' -or $kind -eq 'none') {
-            $ffArgs += @('--logo', 'none')
+            $logoType = 'none'
         } elseif ($kind -eq 'auto') {
-            $ffArgs += @('--logo-type', 'auto')
+            $logoType = 'auto'
         } elseif ($kind -eq 'small') {
-            $ffArgs += @('--logo-type', 'small')
-            if ($name) { $ffArgs += @('--logo', $name) }
+            $logoType = 'small'
+            $logoSource = $name
         } elseif ($kind -eq 'builtin' -and $name) {
-            $ffArgs += @('--logo-type', 'builtin', '--logo', $name)
+            $logoType = 'builtin'
+            $logoSource = $name
         } else {
             Ensure-ArtLines $Art
-            $tmp = Join-Path $env:TEMP 'better-terminal-preview-logo.txt'
-            $logoText = ((@($Art.Lines) -join "`n") + "`n")
-            Write-Utf8NoBom -Path $tmp -Text $logoText
-            $ffArgs += @('--file', $tmp)
+            $logoFile = Join-Path $env:TEMP 'better-terminal-preview-logo.txt'
+            Write-Utf8NoBom -Path $logoFile -Text (((@($Art.Lines) -join "`n") + "`n"))
+            $logoType = 'file'
+            $logoSource = $logoFile.Replace('\', '/')
         }
+        $logoJson = Convert-FastfetchLogoJson -Type $logoType -Source $logoSource -Plan $script:StudioPlan
+        $moduleJson = Convert-FastfetchModulesToJson -Ids (Get-PlanFastfetchModuleIds $script:StudioPlan)
+        $displayJson = Convert-FastfetchDisplayJson -Plan $script:StudioPlan
+        $previewText = @"
+{
+$logoJson
+$displayJson
+    "modules": [
+$moduleJson
+    ]
+}
+"@
+        Write-Utf8NoBom -Path $previewCfg -Text $previewText
+        $ffArgs = @('--config', $previewCfg, '--pipe')
         $out = @()
         try { $out = @(& fastfetch @ffArgs 2>$null) } catch { $out = @() }
         $lines = @($out | ForEach-Object { Strip-AnsiText $_ })
@@ -3041,7 +4088,12 @@ function Get-LastLookFromInstalledSettings {
         ArtId      = $null
         Posh       = $null
         Opacity    = $null
-        UseAcrylic = $null
+        UseAcrylic   = $null
+        FetchLook    = $null
+        FetchModules = $null
+        LogoColor1   = $null
+        LogoColor2   = $null
+        KeyColor     = $null
     }
 
     $wt = Get-WindowsTerminalSettingsPath
@@ -3084,6 +4136,28 @@ function Get-LastLookFromInstalledSettings {
                     $look.Art = $source
                 }
             }
+            if ($cfg.modules) {
+                $ids = @()
+                foreach ($m in @($cfg.modules)) {
+                    if ($m -is [string]) {
+                        if (-not [string]::IsNullOrWhiteSpace($m)) { $ids += [string]$m }
+                        continue
+                    }
+                    $type = [string]$m.type
+                    if ($type -and $type -ne 'custom') { $ids += $type }
+                }
+                $look.FetchModules = @(Sort-FastfetchModuleIds $ids)
+                $look.FetchLook = Resolve-FastfetchLookId -Ids $look.FetchModules
+            }
+            if ($cfg.logo -and $cfg.logo.color) {
+                foreach ($p in @($cfg.logo.color.PSObject.Properties)) {
+                    if ($p.Name -eq '1' -and $p.Value) { $look.LogoColor1 = [string]$p.Value }
+                    if ($p.Name -eq '2' -and $p.Value) { $look.LogoColor2 = [string]$p.Value }
+                }
+            }
+            if ($cfg.display -and $cfg.display.color -and $cfg.display.color.keys) {
+                $look.KeyColor = [string]$cfg.display.color.keys
+            }
         } catch {}
     }
 
@@ -3103,26 +4177,14 @@ function Get-LastLookFromInstalledSettings {
 }
 
 function Get-LastLookSnapshot {
-    $snap = Get-LastLookFromInstalledSettings
     $path = Get-LastLookPath
-    if (-not (Test-Path $path)) { return $snap }
-    try {
-        $saved = Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json
-    } catch {
-        return $snap
+    if (Test-Path $path) {
+        try {
+            $saved = Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($saved) { return $saved }
+        } catch {}
     }
-    if (-not $saved) { return $snap }
-    foreach ($key in @('Theme', 'Font', 'FontLabel', 'Art', 'ArtId', 'Posh', 'Opacity', 'UseAcrylic')) {
-        if (-not $saved.PSObject.Properties[$key]) { continue }
-        $value = $saved.$key
-        if ($null -eq $value) { continue }
-        if ($key -eq 'Opacity' -or $key -eq 'UseAcrylic') {
-            $snap.$key = $value
-            continue
-        }
-        if ([string]$value -ne '') { $snap.$key = $value }
-    }
-    return $snap
+    return (Get-LastLookFromInstalledSettings)
 }
 
 function Find-SavedFont {
@@ -3190,6 +4252,33 @@ function Restore-LastLookToPlan {
         $Plan.UseAcrylic = [bool]$saved.UseAcrylic
         $script:RestoredLastLook = $true
     }
+    if ($saved.PSObject.Properties['FetchLook'] -and $saved.FetchLook) {
+        $Plan.FetchLook = [string]$saved.FetchLook
+        $script:RestoredLastLook = $true
+    }
+    if ($saved.PSObject.Properties['FetchModules'] -and $null -ne $saved.FetchModules) {
+        $Plan.FetchModules = @(Sort-FastfetchModuleIds @($saved.FetchModules | ForEach-Object { [string]$_ }))
+        $Plan.FetchLook = Resolve-FastfetchLookId -Ids $Plan.FetchModules
+        $script:RestoredLastLook = $true
+    } else {
+        $resolvedLook = Get-PlanFastfetchLook $Plan
+        if ($resolvedLook) {
+            $Plan.FetchLook = [string]$resolvedLook.Id
+            $Plan.FetchModules = @($resolvedLook.Modules)
+        }
+    }
+    if ($saved.PSObject.Properties['LogoColor1'] -and $saved.LogoColor1) {
+        $Plan.LogoColor1 = Get-PlanLogoColor $saved 1 'cyan'
+        $script:RestoredLastLook = $true
+    }
+    if ($saved.PSObject.Properties['LogoColor2'] -and $saved.LogoColor2) {
+        $Plan.LogoColor2 = Get-PlanLogoColor $saved 2 'blue'
+        $script:RestoredLastLook = $true
+    }
+    if ($saved.PSObject.Properties['KeyColor'] -and $saved.KeyColor) {
+        $Plan.KeyColor = Get-PlanKeyColor $saved 'blue'
+        $script:RestoredLastLook = $true
+    }
     return [bool]$script:RestoredLastLook
 }
 
@@ -3204,12 +4293,28 @@ function Save-LastLook {
         ArtId      = if ($Plan.Art) { [string]$Plan.Art.Id } else { '' }
         Posh       = if ($Plan.Posh) { [string]$Plan.Posh.Id } else { '' }
         Opacity    = [int]$Plan.Opacity
-        UseAcrylic = [bool]$Plan.UseAcrylic
-        SavedAt    = (Get-Date).ToString('o')
+        UseAcrylic   = [bool]$Plan.UseAcrylic
+        FetchLook    = if ($Plan.FetchLook) { [string]$Plan.FetchLook } else { 'default' }
+        FetchModules = @(Get-PlanFastfetchModuleIds $Plan)
+        LogoColor1   = Get-PlanLogoColor $Plan 1 'cyan'
+        LogoColor2   = Get-PlanLogoColor $Plan 2 'blue'
+        KeyColor     = Get-PlanKeyColor $Plan 'blue'
+        SavedAt      = (Get-Date).ToString('o')
     }
     try {
         Write-Utf8NoBom -Path (Get-LastLookPath) -Text ($obj | ConvertTo-Json -Depth 4)
     } catch {}
+}
+
+function Sync-LastLookCache {
+    if (-not $script:StudioReady) { return }
+    if ($script:StudioPlan) { Save-LastLook -Plan $script:StudioPlan }
+}
+
+function Test-LookPropertyMatch {
+    param($Left, $Right)
+    if ([string]::IsNullOrWhiteSpace($Left) -or [string]::IsNullOrWhiteSpace($Right)) { return $false }
+    return ([string]$Left).Trim().ToLowerInvariant() -eq ([string]$Right).Trim().ToLowerInvariant()
 }
 
 function Select-StudioGridRow {
@@ -3220,9 +4325,7 @@ function Select-StudioGridRow {
         foreach ($row in $Grid.Rows) {
             if ($row.IsNewRow -or -not $row.Tag) { continue }
             foreach ($prop in $Properties) {
-                $left = [string]$row.Tag.$prop
-                $right = [string]$Wanted.$prop
-                if ($left -and $right -and ($left -eq $right)) {
+                if (Test-LookPropertyMatch $row.Tag.$prop $Wanted.$prop) {
                     $match = $row
                     break
                 }
@@ -3231,6 +4334,7 @@ function Select-StudioGridRow {
         }
     }
     if (-not $match) { $match = $Grid.Rows[0] }
+    try { $match.Visible = $true } catch {}
     try { $Grid.ClearSelection() } catch {}
     $match.Selected = $true
     if ($match.Cells.Count -gt 0) {
@@ -3255,39 +4359,41 @@ function Invoke-DownloadEverything {
 
     try {
         if ($Plan.InstallOhMyPosh) {
-            if (-not (Install-OhMyPoshPackage)) { $failed += 'Oh My Posh' }
+            try { if (-not (Install-OhMyPoshPackage)) { $failed += 'Oh My Posh' } } catch { $failed += 'Oh My Posh' }
             Write-Host ""
         }
         if ($Plan.InstallFastfetch) {
-            if (-not (Install-FastfetchPackage)) { $failed += 'Fastfetch' }
+            try { if (-not (Install-FastfetchPackage)) { $failed += 'Fastfetch' } } catch { $failed += 'Fastfetch' }
             Write-Host ""
         }
         if ($Plan.InstallTerminalIcons -ne $false) {
-            if (-not (Install-TerminalIconsPackage)) { $failed += 'Terminal-Icons' }
+            try { if (-not (Install-TerminalIconsPackage)) { $failed += 'Terminal-Icons' } } catch { $failed += 'Terminal-Icons' }
             Write-Host ""
         }
 
-        [void](Import-AllNerdFonts)
+        try { [void](Import-AllNerdFonts) } catch { Write-Color "  Font list download failed: $($_.Exception.Message)" '#F9E2AF' }
         Write-Host ""
         if ($Plan.InstallFont) {
-            $meslo = Get-PreferredCatalogItem -Items (Get-FontCatalog) -Names @('Meslo') -Property 'Id'
-            if ($meslo) {
-                if (Test-FontInstalled $meslo) {
-                    Write-Color '  Meslo is already installed.' '#A6E3A1'
-                } elseif (-not (Install-NerdFontPackage -Font $meslo)) {
-                    $failed += 'Nerd Font'
+            try {
+                $meslo = Get-PreferredCatalogItem -Items (Get-FontCatalog) -Names @('Meslo') -Property 'Id'
+                if ($meslo) {
+                    if (Test-FontInstalled $meslo) {
+                        Write-Color '  Meslo is already installed.' '#A6E3A1'
+                    } elseif (-not (Install-NerdFontPackage -Font $meslo)) {
+                        $failed += 'Nerd Font'
+                    }
+                    $script:InstalledFontMap = $null
+                    $script:TypefaceCache = @{}
                 }
-                $script:InstalledFontMap = $null
-                $script:TypefaceCache = @{}
-            }
+            } catch { $failed += 'Nerd Font' }
             Write-Host ""
         }
 
-        [void](Import-AllColorThemes)
+        try { [void](Import-AllColorThemes) } catch { Write-Color "  Color list download failed: $($_.Exception.Message)" '#F9E2AF' }
         Write-Host ""
-        [void](Import-AllPoshThemes)
+        try { [void](Import-AllPoshThemes) } catch { Write-Color "  Prompt list download failed: $($_.Exception.Message)" '#F9E2AF' }
         Write-Host ""
-        [void](Import-AllFastfetchLogos)
+        try { [void](Import-AllFastfetchLogos) } catch { Write-Color "  Fastfetch list download failed: $($_.Exception.Message)" '#F9E2AF' }
         Write-Host ""
         Write-Color '  All lists are ready. Opening the picker...' '#A6E3A1'
     } finally {
@@ -3609,6 +4715,230 @@ function Set-WindowsTerminalLook {
     return $true
 }
 
+function Get-DefaultFastfetchModuleIds {
+    @(
+        'title', 'separator', 'os', 'host', 'kernel', 'uptime', 'packages', 'shell',
+        'display', 'de', 'wm', 'wmtheme', 'theme', 'icons', 'font', 'cursor',
+        'terminal', 'terminalfont', 'cpu', 'gpu', 'memory', 'swap', 'disk',
+        'localip', 'battery', 'poweradapter', 'locale'
+    )
+}
+
+function Get-FastfetchModuleCatalog {
+    @(
+        @{ Id = 'title';        Label = 'Name and PC';        Note = 'you@YOUR-PC' }
+        @{ Id = 'separator';    Label = 'Dashed line';        Note = 'The ----- under your name' }
+        @{ Id = 'os';           Label = 'Windows version';    Note = 'Windows 11 Home (25H2)' }
+        @{ Id = 'host';         Label = 'PC model';           Note = 'Your motherboard or laptop model' }
+        @{ Id = 'kernel';       Label = 'Windows build';      Note = 'WIN32_NT 10.0.26200' }
+        @{ Id = 'uptime';       Label = 'Time switched on';   Note = 'How long since the last restart' }
+        @{ Id = 'packages';     Label = 'Installed packages'; Note = 'Counted from choco, winget, scoop' }
+        @{ Id = 'shell';        Label = 'Shell';              Note = 'PowerShell and its version' }
+        @{ Id = 'display';      Label = 'Monitors';           Note = 'Size and refresh rate of each screen' }
+        @{ Id = 'de';           Label = 'Desktop';            Note = 'The Windows desktop shell' }
+        @{ Id = 'wm';           Label = 'Window manager';     Note = 'Desktop Window Manager' }
+        @{ Id = 'wmtheme';      Label = 'Window colors';      Note = 'Your accent color, dark or light' }
+        @{ Id = 'theme';        Label = 'App theme';          Note = 'Fluent' }
+        @{ Id = 'icons';        Label = 'Icon pack';          Note = 'The Windows icon set' }
+        @{ Id = 'font';         Label = 'System font';        Note = 'Segoe UI and its size' }
+        @{ Id = 'cursor';       Label = 'Mouse pointer';      Note = 'Pointer style and size' }
+        @{ Id = 'terminal';     Label = 'Terminal app';       Note = 'Windows Terminal and its version' }
+        @{ Id = 'terminalfont'; Label = 'Terminal font';      Note = 'The font this window uses' }
+        @{ Id = 'cpu';          Label = 'Processor';          Note = 'Your CPU name and speed' }
+        @{ Id = 'gpu';          Label = 'Graphics cards';     Note = 'Each GPU and its memory' }
+        @{ Id = 'memory';       Label = 'Memory in use';      Note = '13 GiB / 31 GiB (42%)' }
+        @{ Id = 'swap';         Label = 'Swap file';          Note = 'Windows page file usage' }
+        @{ Id = 'disk';         Label = 'Drives';             Note = 'Free space on each drive' }
+        @{ Id = 'localip';      Label = 'Local IP address';   Note = 'Your address on this network' }
+        @{ Id = 'battery';      Label = 'Battery';            Note = 'Laptops only' }
+        @{ Id = 'poweradapter'; Label = 'Power adapter';      Note = 'Laptops only' }
+        @{ Id = 'locale';       Label = 'Language';           Note = 'en_US and the code page' }
+        @{ Id = 'vulkan';       Label = 'Vulkan';             Note = 'Graphics driver version' }
+        @{ Id = 'opengl';       Label = 'OpenGL';             Note = 'Graphics driver version' }
+        @{ Id = 'opencl';       Label = 'OpenCL';             Note = 'Compute driver version' }
+        @{ Id = 'users';        Label = 'Signed-in users';    Note = 'Who is logged in' }
+        @{ Id = 'sound';        Label = 'Sound devices';      Note = 'Speakers and headsets' }
+        @{ Id = 'datetime';     Label = 'Date and time';      Note = 'Right now' }
+        @{ Id = 'bios';         Label = 'BIOS';               Note = 'Firmware version and date' }
+        @{ Id = 'board';        Label = 'Motherboard';        Note = 'Board maker and model' }
+        @{ Id = 'wifi';         Label = 'Wi-Fi';              Note = 'Network name and signal' }
+        @{ Id = 'bluetooth';    Label = 'Bluetooth';          Note = 'Connected devices' }
+        @{ Id = 'media';        Label = 'Now playing';        Note = 'Track playing in Spotify or a browser' }
+    ) | ForEach-Object { [pscustomobject]$_ }
+}
+
+function Get-FastfetchModuleOrder {
+    @(Get-FastfetchModuleCatalog | ForEach-Object { [string]$_.Id })
+}
+
+function Sort-FastfetchModuleIds {
+    param([string[]]$Ids)
+    $want = @{}
+    foreach ($id in @($Ids)) {
+        if (-not [string]::IsNullOrWhiteSpace($id)) { $want[[string]$id] = $true }
+    }
+    $out = @()
+    foreach ($id in (Get-FastfetchModuleOrder)) {
+        if ($want.ContainsKey($id)) { $out += $id }
+    }
+    foreach ($id in @($Ids)) {
+        if (-not [string]::IsNullOrWhiteSpace($id) -and $out -notcontains [string]$id) { $out += [string]$id }
+    }
+    return @($out)
+}
+
+function Get-FastfetchLookCatalog {
+    $official = @(Get-DefaultFastfetchModuleIds)
+    $beforeEnd = @($official)
+    @(
+        @{
+            Id = 'default'
+            Label = 'Default'
+            Note = 'Official Fastfetch list'
+            Modules = $official
+        }
+        @{
+            Id = 'graphics'
+            Label = 'Graphics'
+            Note = 'Default plus Vulkan, OpenGL, OpenCL'
+            Modules = @($beforeEnd + @('vulkan', 'opengl', 'opencl'))
+        }
+        @{
+            Id = 'neofetch'
+            Label = 'Neofetch'
+            Note = 'Official neofetch-style list'
+            Modules = @(
+                'title', 'separator', 'os', 'host', 'kernel', 'uptime', 'packages', 'shell',
+                'display', 'de', 'wm', 'wmtheme', 'theme', 'icons', 'terminal', 'terminalfont',
+                'cpu', 'gpu', 'memory'
+            )
+        }
+        @{
+            Id = 'small'
+            Label = 'Small'
+            Note = 'A short official list'
+            Modules = @(
+                'title', 'separator', 'os', 'host', 'kernel', 'uptime', 'packages', 'shell',
+                'display', 'terminal', 'cpu', 'gpu', 'memory'
+            )
+        }
+        @{
+            Id = 'all'
+            Label = 'All'
+            Note = 'More hardware and graphics lines'
+            Modules = @(
+                $beforeEnd + @(
+                    'vulkan', 'opengl', 'opencl', 'users', 'sound', 'datetime',
+                    'bios', 'board', 'wifi', 'bluetooth', 'media'
+                )
+            )
+        }
+        @{
+            Id = 'logo'
+            Label = 'Logo only'
+            Note = 'Picture only, no info lines'
+            Modules = @()
+        }
+    ) | ForEach-Object { [pscustomobject]$_ }
+}
+
+function Resolve-FastfetchLookId {
+    param([string[]]$Ids)
+    $want = (@($Ids | ForEach-Object { [string]$_ } | Where-Object { $_ }) -join ',')
+    foreach ($look in @(Get-FastfetchLookCatalog)) {
+        $have = (@($look.Modules) -join ',')
+        if ($have -eq $want) { return [string]$look.Id }
+    }
+    if (-not $want) { return 'logo' }
+    if ($Ids -contains 'vulkan' -or $Ids -contains 'opengl') { return 'graphics' }
+    return 'default'
+}
+
+function Get-PlanFastfetchLook {
+    param($Plan)
+    $items = @(Get-FastfetchLookCatalog)
+    $id = 'default'
+    if ($Plan -and $Plan.PSObject.Properties['FetchLook'] -and $Plan.FetchLook) {
+        $id = [string]$Plan.FetchLook
+    } elseif ($Plan -and $Plan.PSObject.Properties['FetchModules'] -and $null -ne $Plan.FetchModules) {
+        $id = Resolve-FastfetchLookId -Ids @($Plan.FetchModules)
+    }
+    $hit = @($items | Where-Object { $_.Id -eq $id } | Select-Object -First 1)
+    if ($hit.Count -gt 0 -and $hit[0]) { return $hit[0] }
+    return ($items | Where-Object { $_.Id -eq 'default' } | Select-Object -First 1)
+}
+
+function Get-PlanFastfetchModuleIds {
+    param($Plan)
+    if ($Plan -and $Plan.PSObject.Properties['FetchModules'] -and $null -ne $Plan.FetchModules) {
+        return @(@($Plan.FetchModules) |
+            ForEach-Object { [string]$_ } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    }
+    $look = Get-PlanFastfetchLook $Plan
+    if ($look) { return @($look.Modules) }
+    return @(Get-DefaultFastfetchModuleIds)
+}
+
+function Convert-FastfetchModulesToJson {
+    param([string[]]$Ids)
+    $parts = @()
+    foreach ($id in @($Ids)) {
+        if ([string]::IsNullOrWhiteSpace($id)) { continue }
+        $parts += ('        "{0}"' -f $id)
+    }
+    if ($parts.Count -eq 0) { return '' }
+    return ($parts -join ",`n")
+}
+
+function Convert-FastfetchDisplayJson {
+    param($Plan)
+    $keys = Get-PlanKeyColor $Plan 'blue'
+    return @"
+    "display": {
+        "separator": ": ",
+        "color": {
+            "keys": "$keys"
+        }
+    },
+"@
+}
+
+function Convert-FastfetchLogoJson {
+    param(
+        [string]$Type,
+        [string]$Source,
+        $Plan
+    )
+    $c1 = Get-PlanLogoColor $Plan 1 'cyan'
+    $c2 = Get-PlanLogoColor $Plan 2 'blue'
+    $color = @"
+        "color": {
+            "1": "$c1",
+            "2": "$c2"
+        }
+"@
+    if ($Type -eq 'none') {
+        return "    `"logo`": { `"type`": `"none`" },"
+    }
+    if (($Type -eq 'builtin' -or $Type -eq 'small' -or $Type -eq 'file') -and $Source) {
+        $safe = $Source.Replace('\', '\\').Replace('"', '\"')
+        return @"
+    "logo": {
+        "type": "$Type",
+        "source": "$safe",
+$color
+    },
+"@
+    }
+    return @"
+    "logo": {
+        "type": "auto",
+$color
+    },
+"@
+}
+
 function Set-FastfetchLook {
     param($State)
 
@@ -3639,58 +4969,17 @@ function Set-FastfetchLook {
         }
     }
 
-    $logoJson = if ($logoType -eq 'none') {
-        @"
-    "logo": {
-        "type": "none"
-    },
-"@
-    } elseif (($logoType -eq 'builtin' -or $logoType -eq 'small') -and $logoSource) {
-        $safe = $logoSource.Replace('\', '\\').Replace('"', '\"')
-        @"
-    "logo": {
-        "type": "$logoType",
-        "source": "$safe"
-    },
-"@
-    } elseif ($logoType -eq 'file' -and $logoSource) {
-        @"
-    "logo": {
-        "type": "file",
-        "source": "$logoSource",
-        "color": { "1": "cyan", "2": "blue", "3": "magenta" }
-    },
-"@
-    } else {
-        @"
-    "logo": {
-        "type": "auto"
-    },
-"@
-    }
+    $logoJson = Convert-FastfetchLogoJson -Type $logoType -Source $logoSource -Plan $State
 
+    $moduleJson = Convert-FastfetchModulesToJson -Ids (Get-PlanFastfetchModuleIds $State)
+    $displayJson = Convert-FastfetchDisplayJson -Plan $State
     $jsonc = @"
 {
     "`$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
 $logoJson
-    "display": {
-        "separator": "  "
-    },
+$displayJson
     "modules": [
-        "title",
-        "separator",
-        "os",
-        "host",
-        "kernel",
-        "uptime",
-        "shell",
-        "terminal",
-        "cpu",
-        "gpu",
-        "memory",
-        "disk",
-        "break",
-        "colors"
+$moduleJson
     ]
 }
 "@
@@ -3826,7 +5115,7 @@ function Show-WelcomeScreen {
     Clear-ScreenSoft
     Show-Banner -Title 'Better Terminal Setup' -Step 1 -Total 3
     Write-Color '  Type Y to download everything first.' '#C0CAF5'
-    Write-Color '  Then a window opens with every color theme, prompt, Fastfetch logo, and font.' '#C0CAF5'
+    Write-Color '  Then a window opens with every color theme, font, art picture, Fastfetch look, and prompt.' '#C0CAF5'
     Write-Host ""
     Write-Color '  This download includes:' '#CBA6F7'
     Write-Host ""
@@ -3868,6 +5157,11 @@ function Get-InstallPlan {
         Font                = $null
         Art                 = $null
         Posh                = $null
+        FetchLook           = 'default'
+        FetchModules        = @(Get-DefaultFastfetchModuleIds)
+        LogoColor1          = 'cyan'
+        LogoColor2          = 'blue'
+        KeyColor            = 'blue'
         Opacity             = 80
         UseAcrylic          = $true
     }
@@ -3895,7 +5189,7 @@ function Get-InstallPlan {
         $plan.InstallFastfetch = Read-YesNo -Prompt 'Add the startup picture?' -Default 'Y'
         Write-Host ""
 
-        Write-Color '  After the download, you still pick colors, prompt, Fastfetch, and transparency in the window.' '#CBA6F7'
+        Write-Color '  After the download, you still pick colors, art, a Fastfetch look, prompt, and transparency in the window.' '#CBA6F7'
         Write-Host ""
         $plan.ApplyTheme = Read-YesNo -Prompt 'Change the terminal colors?' -Default 'Y'
         $plan.ApplyTransparency = Read-YesNo -Prompt 'Add window transparency?' -Default 'Y'
@@ -4247,15 +5541,6 @@ function Show-DoneScreen {
 function Start-BetterTerminalSetup {
     Enable-VirtualTerminal
     Clear-MissingEditorFonts
-
-    if ($PSVersionTable.PSVersion.Major -lt 7) {
-        $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
-        if ($pwsh) {
-            Write-Color '  Opening in PowerShell 7 so settings save more reliably...' '#89B4FA'
-            & $pwsh.Source -NoProfile -ExecutionPolicy Bypass -File $PSCommandPath
-            exit $LASTEXITCODE
-        }
-    }
 
     try {
         $plan = Get-InstallPlan
