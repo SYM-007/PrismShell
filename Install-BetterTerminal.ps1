@@ -5022,8 +5022,72 @@ function Set-CursorTerminalFont {
     }
 }
 
+function Get-ScriptPolicyBlocker {
+    try {
+        foreach ($row in @(Get-ExecutionPolicy -List)) {
+            $scope = [string]$row.Scope
+            $value = [string]$row.ExecutionPolicy
+            if (($scope -eq 'MachinePolicy' -or $scope -eq 'UserPolicy') -and
+                ($value -eq 'Restricted' -or $value -eq 'AllSigned')) {
+                return $scope
+            }
+        }
+    } catch {}
+    return $null
+}
+
+function Enable-ProfileScripts {
+    if ($script:ScriptPolicyChecked) { return -not $script:ScriptsBlocked }
+    $script:ScriptPolicyChecked = $true
+    $script:ScriptsBlocked = $false
+
+    $effective = 'Restricted'
+    try { $effective = [string](Get-ExecutionPolicy) } catch { return $true }
+    if ($effective -ne 'Restricted' -and $effective -ne 'AllSigned') { return $true }
+
+    Write-Host ""
+    Write-Color '  This PC blocks PowerShell scripts, so your new prompt would not start.' '#F9E2AF'
+
+    $blocker = Get-ScriptPolicyBlocker
+    if ($blocker) {
+        $script:ScriptsBlocked = $true
+        Write-Color "  A Windows policy ($blocker) is doing this, so the helper cannot change it." '#F38BA8'
+        Write-Color '  Ask whoever manages this PC to allow RemoteSigned scripts.' '#89B4FA'
+        return $false
+    }
+
+    Write-Color '  Allowing scripts for your account only. This is the setting Microsoft recommends.' '#CBA6F7'
+    Write-Color '  Same as running: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
+    try {
+        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
+        Write-Color '  Scripts are allowed for your account now.' '#A6E3A1'
+        return $true
+    } catch {
+        $script:ScriptsBlocked = $true
+        Write-Color "  Could not change it: $($_.Exception.Message)" '#F38BA8'
+        Write-Color '  Open PowerShell and run this one line, then run this helper again:' '#F9E2AF'
+        Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
+        return $false
+    }
+}
+
+function Unblock-HelperFiles {
+    # Files copied from a zip or a download keep a "came from the internet" mark.
+    # Under RemoteSigned that mark alone stops the helper from running.
+    $here = $PSScriptRoot
+    if ([string]::IsNullOrWhiteSpace($here)) { return }
+    foreach ($name in @('Install-BetterTerminal.ps1', 'Start-BetterTerminal.cmd')) {
+        $path = Join-Path $here $name
+        if (Test-Path $path) {
+            try { Unblock-File -Path $path -ErrorAction SilentlyContinue } catch {}
+        }
+    }
+}
+
 function Set-PowerShellProfileLook {
     param($State)
+
+    [void](Enable-ProfileScripts)
 
     $poshLine = ''
     if ($State.InstallOhMyPosh -and $State.Posh) {
@@ -5103,6 +5167,7 @@ $fastfetchLine
         $existing = [regex]::Replace($existing, '(?m)^(\s*fastfetch --config \$eagleFastfetchConfig.*)$', '# Better Terminal now draws Fastfetch. Old line: $1')
 
         Set-Content -Path $profilePath -Value ($existing.TrimEnd() + $block) -Encoding UTF8
+        try { Unblock-File -Path $profilePath -ErrorAction SilentlyContinue } catch {}
         Write-Color "  PowerShell profile updated: $profilePath" '#A6E3A1'
     }
 }
@@ -5518,6 +5583,15 @@ function Show-DoneScreen {
         Write-Host ""
     }
 
+    if ($script:ScriptsBlocked) {
+        Write-Color '  One thing still needs you' '#F38BA8'
+        Write-Color '  This PC blocks PowerShell scripts, so the new prompt cannot start by itself.' '#F9E2AF'
+        Write-Color '  Open PowerShell and run this one line:' '#C0CAF5'
+        Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
+        Write-Color '  Answer Y, then open a new terminal. Colors and the font already work without it.' '#C0CAF5'
+        Write-Host ""
+    }
+
     Write-Color '  Close this terminal, then open it again.' '#F9E2AF'
     Write-Color '  The new window is where you will see the colors, font, prompt, and Fastfetch.' '#C0CAF5'
     Write-Color '  Run this helper again anytime. Your look will already be selected so you can change just one thing.' '#A6E3A1'
@@ -5540,6 +5614,8 @@ function Show-DoneScreen {
 
 function Start-BetterTerminalSetup {
     Enable-VirtualTerminal
+    [void](Enable-ProfileScripts)
+    Unblock-HelperFiles
     Clear-MissingEditorFonts
 
     try {

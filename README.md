@@ -107,7 +107,7 @@ The helper then:
 1. Downloads the chosen Nerd Font zip **if that font is not already installed**.
 2. Writes colors, font, and transparency to **Windows Terminal defaults and every profile**.
 3. Writes Fastfetch config to `%USERPROFILE%\.config\fastfetch\`.
-4. Writes a `Better Terminal Setup` block into **both** PowerShell profiles (5.1 and 7).
+4. Writes a `Better Terminal Setup` block into **both** PowerShell profiles (5.1 and 7). If this PC blocks PowerShell scripts, it first allows them for your account only (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`), because a blocked PC refuses to load that profile.
 5. Writes Cursor’s terminal font only if that exact Windows family name is installed.
 6. Closes the picker and the preview.
 7. Tells you to **close the terminal and open it again**.
@@ -629,6 +629,8 @@ If the warning comes back, delete that line.
 | Problem | What to try |
 | --- | --- |
 | Script will not run | Right-click `Start-BetterTerminal.cmd` and choose **Run**, or unblock the `.ps1` file |
+| `running scripts is disabled on this system` when you open PowerShell | That PC blocks scripts, so the profile cannot load. The helper now fixes this for you. To fix it by hand, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` and answer **Y** |
+| Same error on a work or school PC | A Windows group policy is forcing it. Only whoever manages that PC can change it. Colors and the font still work; only the prompt and Fastfetch lines need scripts |
 | No picker window | Windows blocked WinForms. Allow it, then run again |
 | Icons are empty boxes | New tab, or sign out so Windows sees the new font |
 | Cursor font warning | The saved family is not installed. Remove `terminal.integrated.fontFamily` or pick `CaskaydiaCove NF` / `MesloLGM Nerd Font` |
