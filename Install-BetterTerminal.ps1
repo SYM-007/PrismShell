@@ -27,7 +27,7 @@ $script:NerdFontsReleaseUrl = 'https://github.com/ryanoasis/nerd-fonts/releases/
 $script:NerdFontsSiteUrl = 'https://www.nerdfonts.com/'
 $script:OhMyPoshSiteUrl = 'https://ohmyposh.dev/docs/installation/prompt'
 $script:OhMyPoshThemesUrl = 'https://ohmyposh.dev/docs/themes'
-$script:OhMyPoshInstallUrl = 'https://ohmyposh.dev/install.ps1'
+$script:OhMyPoshReleaseUrl = 'https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download'
 $script:FastfetchRepoUrl = 'https://github.com/fastfetch-cli/fastfetch'
 $script:TerminalIconsUrl = 'https://github.com/devblackops/terminal-icons'
 $script:TerminalIconsGallery = 'https://www.powershellgallery.com/packages/Terminal-Icons'
@@ -4436,17 +4436,49 @@ function Install-OhMyPoshPackage {
     Update-SessionPath
     if (Test-CommandExists 'oh-my-posh') { return $true }
 
-    Write-Color '  The first download method did not finish. Trying the official website next...' '#F9E2AF'
-    Write-Color "  From: $script:OhMyPoshInstallUrl" '#89B4FA'
+    Write-Color '  winget could not do it. Downloading the official program instead...' '#F9E2AF'
+    return (Install-OhMyPoshBinary)
+}
+
+function Add-UserPathEntry {
+    param([string]$Folder)
+    if ([string]::IsNullOrWhiteSpace($Folder)) { return }
+    $user = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if ($null -eq $user) { $user = '' }
+    $parts = @($user -split ';' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    foreach ($part in $parts) {
+        if ($part.TrimEnd('\') -eq $Folder.TrimEnd('\')) { return }
+    }
+    [Environment]::SetEnvironmentVariable('Path', ((@($parts) + @($Folder)) -join ';'), 'User')
+}
+
+function Install-OhMyPoshBinary {
+    # Save the official signed program to disk and run it from there.
+    # The helper never downloads code and runs it straight from memory.
+    $arch = 'amd64'
+    if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64' -or $env:PROCESSOR_ARCHITEW6432 -eq 'ARM64') { $arch = 'arm64' }
+    $url = "$script:OhMyPoshReleaseUrl/posh-windows-$arch.exe"
+    $dir = Join-Path $env:LOCALAPPDATA 'Programs\oh-my-posh\bin'
+    $exe = Join-Path $dir 'oh-my-posh.exe'
+
+    Write-Color "  From: $url" '#89B4FA'
     try {
-        Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($script:OhMyPoshInstallUrl))
-        Update-SessionPath
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Invoke-WebRequest -Uri $url -OutFile $exe -UseBasicParsing -TimeoutSec 180
     } catch {
-        Write-Color "  Official installer failed: $($_.Exception.Message)" '#F38BA8'
+        Write-Color "  Could not download Oh My Posh: $($_.Exception.Message)" '#F38BA8'
         return $false
     }
-    return (Test-CommandExists 'oh-my-posh')
+
+    Add-UserPathEntry -Folder $dir
+    Update-SessionPath
+    if ($env:Path -notlike "*$dir*") { $env:Path = "$env:Path;$dir" }
+    if (Test-CommandExists 'oh-my-posh') {
+        Write-Color "  Oh My Posh saved to $exe" '#A6E3A1'
+        return $true
+    }
+    return $false
 }
 
 function Install-NerdFontPackage {

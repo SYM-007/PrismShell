@@ -68,7 +68,7 @@ The helper builds a plan. With **Y**, that plan is:
 
 | Step | What is installed or downloaded | Official source |
 | --- | --- | --- |
-| Oh My Posh | The prompt program | winget `JanDeDobbeleer.OhMyPosh`, or [ohmyposh.dev/install.ps1](https://ohmyposh.dev/install.ps1) |
+| Oh My Posh | The prompt program | winget `JanDeDobbeleer.OhMyPosh`, or the signed `posh-windows-amd64.exe` from the [latest GitHub release](https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest) |
 | Fastfetch | The startup logo + PC info tool | winget `Fastfetch-cli.Fastfetch`, or the latest `windows-amd64.zip` from [fastfetch-cli/fastfetch](https://github.com/fastfetch-cli/fastfetch) |
 | Terminal-Icons | File and folder icons in `Get-ChildItem` | [PowerShell Gallery: Terminal-Icons](https://www.powershellgallery.com/packages/Terminal-Icons) |
 | Nerd Fonts **list** | Every official zip name | [Nerd Fonts v3.5.1 release](https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.5.1) |
@@ -171,7 +171,8 @@ The helper only saves a font name that `InstalledFontCollection` can see. That i
 | --- | --- |
 | Theme gallery | https://ohmyposh.dev/docs/themes |
 | Prompt install docs | https://ohmyposh.dev/docs/installation/prompt |
-| Official installer | https://ohmyposh.dev/install.ps1 |
+| Program download | https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-windows-amd64.exe |
+| Saved to | `%LOCALAPPDATA%\Programs\oh-my-posh\bin\oh-my-posh.exe`, added to your user PATH |
 | Theme files | https://github.com/JanDeDobbeleer/oh-my-posh/tree/main/themes |
 | Theme API | https://api.github.com/repos/JanDeDobbeleer/oh-my-posh/contents/themes |
 | One file | `https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/<id>.omp.json` |
@@ -631,6 +632,7 @@ If the warning comes back, delete that line.
 | Script will not run | Right-click `Start-BetterTerminal.cmd` and choose **Run**, or unblock the `.ps1` file |
 | `running scripts is disabled on this system` when you open PowerShell | That PC blocks scripts, so the profile cannot load. The helper now fixes this for you. To fix it by hand, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` and answer **Y** |
 | Same error on a work or school PC | A Windows group policy is forcing it. Only whoever manages that PC can change it. Colors and the font still work; only the prompt and Fastfetch lines need scripts |
+| Antivirus says `TrojanDownloader` or `NetLoader` | Older copies of this helper fetched the Oh My Posh installer and ran it from memory, which looks exactly like malware to Defender. The helper no longer does this: it saves the signed `posh-windows-amd64.exe` to disk and runs it from there. Update to the current `Install-BetterTerminal.ps1` |
 | No picker window | Windows blocked WinForms. Allow it, then run again |
 | Icons are empty boxes | New tab, or sign out so Windows sees the new font |
 | Cursor font warning | The saved family is not installed. Remove `terminal.integrated.fontFamily` or pick `CaskaydiaCove NF` / `MesloLGM Nerd Font` |
