@@ -9,7 +9,7 @@
     transparency, ASCII art, and a sharper PowerShell command line.
 
     Run from Windows Terminal or PowerShell:
-        powershell -ExecutionPolicy Bypass -File .\Install-BetterTerminal.ps1
+        powershell -NoProfile -File .\Install-BetterTerminal.ps1
 
     Or double-click Start-BetterTerminal.cmd
 #>
@@ -27,7 +27,6 @@ $script:NerdFontsReleaseUrl = 'https://github.com/ryanoasis/nerd-fonts/releases/
 $script:NerdFontsSiteUrl = 'https://www.nerdfonts.com/'
 $script:OhMyPoshSiteUrl = 'https://ohmyposh.dev/docs/installation/prompt'
 $script:OhMyPoshThemesUrl = 'https://ohmyposh.dev/docs/themes'
-$script:OhMyPoshReleaseUrl = 'https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download'
 $script:FastfetchRepoUrl = 'https://github.com/fastfetch-cli/fastfetch'
 $script:TerminalIconsUrl = 'https://github.com/devblackops/terminal-icons'
 $script:TerminalIconsGallery = 'https://www.powershellgallery.com/packages/Terminal-Icons'
@@ -83,7 +82,7 @@ function ConvertFrom-HexColor {
     if ($clean.Length -eq 3) {
         $clean = -join ($clean.ToCharArray() | ForEach-Object { "$_$_" })
     }
-    if ($clean.Length -lt 6) { $clean = '808080' }
+    if ($clean -notmatch '^[0-9a-fA-F]{6}$') { $clean = '808080' }
     [pscustomobject]@{
         R = [Convert]::ToInt32($clean.Substring(0, 2), 16)
         G = [Convert]::ToInt32($clean.Substring(2, 2), 16)
@@ -1218,7 +1217,7 @@ function Set-StudioOpacity {
     Update-GlassTickLabels
     if ($changed -and $script:StudioReady) {
         Sync-LastLookCache
-        Update-StudioPreview
+        Request-StudioPreview
     }
 }
 
@@ -1314,7 +1313,8 @@ function Initialize-PreviewPopup {
     $form.Size = New-Object System.Drawing.Size(720, 460)
     $form.MinimumSize = New-Object System.Drawing.Size(640, 400)
     $form.StartPosition = 'CenterScreen'
-    $form.TopMost = $true
+    $form.TopMost = $false
+    $form.AutoScaleMode = 'Dpi'
     $form.MaximizeBox = $false
     $form.ShowInTaskbar = $true
 
@@ -1614,7 +1614,7 @@ function Get-StudioTabGuide {
         'Colors' { return 'Click a color. The preview updates right away.' }
         'Fonts' { return 'Click a font to preview it. The zip downloads only when you press Use this look.' }
         'Art' { return 'Click a picture for Fastfetch. Add my art keeps a drawing on this PC.' }
-        'Fastfetch' { return 'Turn each info line on or off. The preview above changes as you click.' }
+        'Fastfetch' { return 'Choose the system details shown in your live preview.' }
         'Prompt' { return 'Click a prompt. The colored line under the preview is that prompt.' }
         'Transparency' { return '' }
         default { return 'Click a tab, pick what you like, then Use this look.' }
@@ -1661,7 +1661,6 @@ function Update-StudioTabButtons {
         } else {
             [System.Drawing.Color]::FromArgb(46, 50, 66)
         }
-        $btn.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
     }
 }
 
@@ -1672,9 +1671,8 @@ function Update-StudioChrome {
         $script:StudioGuide.Visible = -not [string]::IsNullOrWhiteSpace($script:StudioGuide.Text)
     }
     if (-not $script:StudioSearchCue) { return }
-    $empty = (-not $script:StudioSearch) -or [string]::IsNullOrWhiteSpace([string]$script:StudioSearch.Text)
     $script:StudioSearchCue.Text = Get-StudioSearchCue
-    $script:StudioSearchCue.Visible = [bool]$empty
+    $script:StudioSearchCue.Visible = $true
 }
 
 function New-ClickTable {
@@ -1703,20 +1701,31 @@ function New-ClickTable {
     $grid.ColumnHeadersHeight = 36
     $grid.DefaultCellStyle.BackColor = $t.GridBg
     $grid.DefaultCellStyle.ForeColor = $t.Text
-    $grid.DefaultCellStyle.SelectionBackColor = $t.Accent
+    $grid.DefaultCellStyle.SelectionBackColor = $t.AccentSoft
     $grid.DefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::White
     $grid.DefaultCellStyle.Font = New-Object System.Drawing.Font('Segoe UI', 10)
     $grid.DefaultCellStyle.Padding = New-Object System.Windows.Forms.Padding(10, 4, 8, 4)
-    $grid.RowTemplate.Height = 34
+    $grid.RowTemplate.Height = 42
     $grid.AlternatingRowsDefaultCellStyle.BackColor = $t.GridAlt
-    $grid.AlternatingRowsDefaultCellStyle.SelectionBackColor = $t.Accent
+    $grid.AlternatingRowsDefaultCellStyle.SelectionBackColor = $t.AccentSoft
     $grid.AlternatingRowsDefaultCellStyle.SelectionForeColor = [System.Drawing.Color]::White
     Enable-StudioDoubleBuffer $grid
     return $grid
 }
 
 function Get-StudioHardwareInfo {
+    param([switch]$Lightweight)
     if ($script:StudioHw) { return $script:StudioHw }
+    if ($Lightweight) {
+        # The fallback must not query WMI/CIM on the UI thread.
+        return [pscustomobject]@{
+            OS = "Windows $([Environment]::OSVersion.Version)"
+            CPU = [string]$env:PROCESSOR_IDENTIFIER
+            GPU = 'Install Fastfetch for hardware details'
+            Memory = 'Not collected in the fallback preview'
+            Disk = 'Not collected in the fallback preview'
+        }
+    }
 
     $os = 'Windows'
     $cpu = [string]$env:PROCESSOR_IDENTIFIER
@@ -1776,19 +1785,26 @@ function Update-StudioPreview {
     $Posh = $script:StudioPlan.Posh
     $Opacity = [int]$script:StudioPlan.Opacity
     if (-not $Theme -or -not $script:StudioUi) { return }
+    $previewKey = @($Theme.name, $Theme.background, $Theme.foreground, $Font.Id,
+        $Art.Id, $Art.Kind, $Art.Source, ($Art.Lines -join "`n"), $Posh.Id, $Opacity, $script:StudioPlan.UseAcrylic,
+        $script:StudioPlan.FetchLook, ($script:StudioPlan.FetchModules -join ','),
+        $script:StudioPlan.LogoColor1, $script:StudioPlan.LogoColor2, $script:StudioPlan.KeyColor) -join '|'
+    if ($script:StudioLastPreviewKey -eq $previewKey) { return }
 
     $themeBg = ConvertTo-DrawingColor $Theme.background
     $fg = ConvertTo-DrawingColor $Theme.foreground
     $accent = ConvertTo-DrawingColor $Theme.blue
     $cyan = ConvertTo-DrawingColor $Theme.cyan
-    $wall = [System.Drawing.Color]::FromArgb(88, 108, 142)
+    $wall = [System.Drawing.Color]::FromArgb(28, 34, 48)
     $bg = Blend-DrawingColor -Front $themeBg -Back $wall -SolidPercent $Opacity
 
     $ui = $script:StudioUi
+    $ui.Preview.SuspendLayout()
+    try {
     if ($ui.Desktop) { $ui.Desktop.BackColor = $wall }
     $ui.Preview.BackColor = $bg
-    $ui.Title.BackColor = $accent
-    $ui.Title.ForeColor = $themeBg
+    $ui.Title.BackColor = (Get-StudioTheme).Surface2
+    $ui.Title.ForeColor = (Get-StudioTheme).Text
     $fontLabel = if ($Font) { $Font.Label } else { 'font' }
     $artLabel = if ($Art) { $Art.Label } else { 'logo' }
     $ui.Title.Text = "  Live preview    $artLabel  ·  $fontLabel  ·  $($Theme.name)  ·  $Opacity%"
@@ -1804,13 +1820,18 @@ function Update-StudioPreview {
         $ui.PromptName.ForeColor = $fg
     }
 
-    $ui.Art.Text = Get-FastfetchFullPreview -Art $Art
+    if ($ui.Meta) {
+        $ui.Title.Text = '  >_  Live terminal'
+        $ui.Meta.Text = "  $($Theme.name)    /    $fontLabel    /    $artLabel    /    $Opacity%"
+        $ui.Meta.BackColor = $bg
+        $ui.Meta.ForeColor = $fg
+    }
+    Set-StudioPreviewText (Get-FastfetchFullPreview -Art $Art)
     if ($script:ArtGrid -and $script:ArtGrid.CurrentRow -and $Art) {
         try { $script:ArtGrid.CurrentRow.Cells[1].Value = Get-ArtSnippet $Art } catch {}
     }
 
     $sampleFace = Resolve-PreviewTypeface -FontEntry $Font -Size 11
-    $ui.Art.Font = New-Object System.Drawing.Font('Consolas', 8)
     if ($ui.FontSample) {
         $ui.FontSample.BackColor = $bg
         $ui.FontSample.ForeColor = $fg
@@ -1823,7 +1844,7 @@ function Update-StudioPreview {
     }
     Update-PromptStrip -Theme $Theme -Posh $Posh -Font $Font
 
-    $ui.Swatch.Controls.Clear()
+    $swatchIndex = 0
     foreach ($dot in @(
         @{ N = 'red'; C = $Theme.red },
         @{ N = 'green'; C = $Theme.green },
@@ -1832,16 +1853,20 @@ function Update-StudioPreview {
         @{ N = 'purple'; C = $Theme.purple },
         @{ N = 'cyan'; C = $Theme.cyan }
     )) {
-        $chip = New-Object System.Windows.Forms.Label
+        if ($ui.Swatch.Controls.Count -gt $swatchIndex) {
+            $chip = $ui.Swatch.Controls[$swatchIndex]
+        } else {
+            $chip = New-Object System.Windows.Forms.Label
+            $ui.Swatch.Controls.Add($chip)
+        }
         $chip.AutoSize = $false
-        $chip.Size = New-Object System.Drawing.Size(54, 16)
+        $chip.Size = New-Object System.Drawing.Size(58, 24)
         $chip.Margin = New-Object System.Windows.Forms.Padding(3, 0, 3, 0)
         $chip.TextAlign = 'MiddleCenter'
         $chip.Text = $dot.N
         $chip.BackColor = ConvertTo-DrawingColor $dot.C
         $chip.ForeColor = $bg
-        $chip.Font = New-Object System.Drawing.Font('Segoe UI', 8, [System.Drawing.FontStyle]::Bold)
-        $ui.Swatch.Controls.Add($chip)
+        $swatchIndex++
     }
 
     if ($ui.Picks) {
@@ -1853,24 +1878,79 @@ function Update-StudioPreview {
         $ui.Picks.Text = "$prefix  $($Theme.name)   |   $(if ($Font) { $Font.Label } else { 'font' })   |   $(if ($Art) { $Art.Label } else { 'art' })   |   Fastfetch $fetchLabel   |   $(if ($Posh) { $Posh.Label } else { 'prompt' })   |   $Opacity%"
     }
 
-    Update-WindowsTerminalLivePreview -Theme $Theme -Font $Font -Opacity $Opacity
+    # The picker previews locally. Only Use this look writes terminal settings.
+    $script:StudioLastPreviewKey = $previewKey
+    } finally { $ui.Preview.ResumeLayout() }
+}
+
+function Set-StudioPreviewText {
+    param([string]$Text)
+    if (-not $script:StudioUi -or -not $script:StudioUi.Art) { return }
+    if ($script:StudioUi.Art.Text -ne $Text) { $script:StudioUi.Art.Text = $Text }
+    Update-StudioPreviewFit
+}
+
+function Update-StudioPreviewFit {
+    if (-not $script:StudioUi -or -not $script:StudioUi.Art) { return }
+    if (-not $script:StudioReady -or -not $script:StudioUi.Art.IsHandleCreated) { return }
+    if ($script:StudioFitting) { return }
+    $script:StudioFitting = $true
+    try {
+    $box = $script:StudioUi.Art
+    $size = [single]10
+    if ($script:StudioUi.Fit -and $script:StudioUi.Fit.Checked -and $box.ClientSize.Width -gt 0) {
+        $lines = @($box.Text -split '\r?\n')
+        $longest = ''
+        foreach ($line in $lines) { if ($line.Length -gt $longest.Length) { $longest = $line } }
+        while ($size -gt 8) {
+            $face = (Resolve-PreviewTypeface -FontEntry $null -Size $size).Font
+            $measure = [Windows.Forms.TextRenderer]::MeasureText($longest, $face)
+            if ($measure.Width -le ($box.ClientSize.Width - 24)) { break }
+            $size -= [single]0.5
+        }
+    }
+    $face = (Resolve-PreviewTypeface -FontEntry $null -Size $size).Font
+    if ($box.Font -ne $face) { $box.Font = $face }
+    $measuredWidth = [Windows.Forms.TextRenderer]::MeasureText(($box.Lines | Sort-Object Length -Descending | Select-Object -First 1), $face).Width
+    $box.ScrollBars = if ($measuredWidth -le ($box.ClientSize.Width - 24)) { 'Vertical' } else { 'Both' }
+    } finally { $script:StudioFitting = $false }
+}
+
+function Request-StudioPreview {
+    if ($script:StudioPreviewTimer -and $script:StudioReady) {
+        $script:StudioPreviewDirty = $true
+        $script:StudioPreviewTimer.Start()
+    }
 }
 
 function Filter-ClickTable {
     param($Grid, [string]$Query)
     if (-not $Grid) { return }
+    if ($Grid.Tag -eq $Query) { return }
+    $Grid.SuspendLayout()
+    $wasReady = $script:StudioReady
+    $script:StudioReady = $false
+    try {
+    $previousRow = $Grid.CurrentRow
     try { $Grid.CurrentCell = $null } catch {}
-    try { $Grid.ClearSelection() } catch {}
     foreach ($row in $Grid.Rows) {
         if ($row.IsNewRow) { continue }
         $hit = $true
         if (-not [string]::IsNullOrWhiteSpace($Query)) {
             $hit = $false
             foreach ($cell in $row.Cells) {
-                if ([string]$cell.Value -like "*$Query*") { $hit = $true; break }
+                if (([string]$cell.Value).IndexOf($Query, [StringComparison]::OrdinalIgnoreCase) -ge 0) { $hit = $true; break }
             }
         }
-        try { $row.Visible = $hit } catch {}
+        if ($row.Visible -ne $hit) { $row.Visible = $hit }
+    }
+    $Grid.Tag = $Query
+    if ($previousRow -and $previousRow.Visible) {
+        $Grid.CurrentCell = $previousRow.Cells[0]
+    }
+    } finally {
+        $script:StudioReady = $wasReady
+        $Grid.ResumeLayout()
     }
 }
 
@@ -1916,12 +1996,6 @@ function Update-StudioSearch {
     if ($null -eq $raw) { $raw = '' }
     $q = $raw.Trim()
 
-    Filter-ClickTable -Grid $script:ThemeGrid -Query ''
-    Filter-ClickTable -Grid $script:FontGrid -Query ''
-    Filter-ClickTable -Grid $script:ArtGrid -Query ''
-    Filter-ClickTable -Grid $script:FetchGrid -Query ''
-    Filter-ClickTable -Grid $script:PoshGrid -Query ''
-
     $tabName = ''
     if ($script:StudioTabs -and $script:StudioTabs.SelectedTab) {
         $tabName = [string]$script:StudioTabs.SelectedTab.Text
@@ -1937,7 +2011,14 @@ function Update-StudioSearch {
         return
     }
 
-    Filter-ClickTable -Grid (Get-CurrentStudioGrid) -Query $q
+    $grid = Get-CurrentStudioGrid
+    Filter-ClickTable -Grid $grid -Query $q
+    if ($script:StudioSearchNote -and $grid) {
+        $visible = Count-VisibleRows $grid
+        $script:StudioSearchNote.Text = "$visible of $($grid.Rows.Count) options"
+        $script:StudioEmptyState.Visible = ($visible -eq 0)
+        if ($visible -eq 0) { $script:StudioEmptyState.BringToFront() }
+    }
     Update-StudioChrome
 }
 
@@ -2005,7 +2086,12 @@ function Update-PromptStrip {
     if (-not $ui -or -not $ui.PromptStrip) { return }
 
     $termBg = if ($ui.Preview) { $ui.Preview.BackColor } else { ConvertTo-DrawingColor $Theme.background }
-    $ui.PromptStrip.Controls.Clear()
+    if (-not $Posh) { $Posh = (Get-PoshCatalog | Select-Object -First 1) }
+    $promptKey = '{0}|{1}|{2}|{3}' -f $Posh.Id, $Font.Id, $termBg.ToArgb(), $Theme.foreground
+    if ($ui.PromptStrip.Tag -eq $promptKey) { return }
+    $ui.PromptStrip.SuspendLayout()
+    try {
+    while ($ui.PromptStrip.Controls.Count -gt 0) { $ui.PromptStrip.Controls[0].Dispose() }
     $ui.PromptStrip.BackColor = $termBg
     $face = Resolve-PreviewTypeface -FontEntry $Font -Size 8
     $ctx = Get-PoshContext
@@ -2021,6 +2107,8 @@ function Update-PromptStrip {
         $ui.PromptName.BackColor = $termBg
         $ui.PromptName.ForeColor = ConvertTo-DrawingColor $Theme.foreground
     }
+    $ui.PromptStrip.Tag = $promptKey
+    } finally { $ui.PromptStrip.ResumeLayout() }
 }
 
 function Show-AddCustomArtDialog {
@@ -2057,7 +2145,8 @@ function Show-AddCustomArtDialog {
     $artLabel.AutoSize = $true
     $artLabel.ForeColor = $t.Muted
 
-    $artBox = New-Object System.Windows.Forms.TextBox
+    $artBox = New-Object System.Windows.Forms.RichTextBox
+    $artBox.DetectUrls = $false
     $artBox.Location = New-Object System.Drawing.Point(20, 78)
     $artBox.Size = New-Object System.Drawing.Size(640, 390)
     $artBox.Anchor = 'Top,Bottom,Left,Right'
@@ -2225,7 +2314,7 @@ function Sync-FastfetchModulesFromGrid {
     if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
     Update-FastfetchCountLabel
     Sync-LastLookCache
-    Update-StudioPreview
+    Request-StudioPreview
 }
 
 function Set-FastfetchRowToggle {
@@ -2285,14 +2374,18 @@ function Show-ChoiceStudio {
     $script:StudioReady = $false
     $script:StudioPlan = $Plan
     $script:StudioResult = 'cancel'
+    $script:StudioUi = $null
+    $script:StudioLastPreviewKey = $null
+    $script:StudioPreviewDirectory = $null
 
     $t = Get-StudioTheme
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Better Terminal'
-    $form.Size = New-Object System.Drawing.Size(1180, 1000)
-    $form.MinimumSize = New-Object System.Drawing.Size(1020, 820)
+    $form.Size = New-Object System.Drawing.Size(1440, 880)
+    $form.MinimumSize = New-Object System.Drawing.Size(1120, 740)
     $form.StartPosition = 'CenterScreen'
-    $form.TopMost = $true
+    $form.TopMost = $false
+    $form.AutoScaleMode = 'Dpi'
     $form.BackColor = $t.Bg
     $form.ForeColor = $t.Text
     $form.Font = New-Object System.Drawing.Font('Segoe UI', 10)
@@ -2301,19 +2394,19 @@ function Show-ChoiceStudio {
 
     $header = New-Object System.Windows.Forms.Panel
     $header.Dock = 'Top'
-    $header.Height = 78
+    $header.Height = 108
     $header.BackColor = $t.Surface
 
     $titleLabel = New-Object System.Windows.Forms.Label
-    $titleLabel.Location = New-Object System.Drawing.Point(20, 12)
+    $titleLabel.Location = New-Object System.Drawing.Point(24, 34)
     $titleLabel.AutoSize = $true
-    $titleLabel.Text = 'Better Terminal'
-    $titleLabel.Font = New-Object System.Drawing.Font('Segoe UI', 16, [System.Drawing.FontStyle]::Bold)
+    $titleLabel.Text = 'Your terminal, refined.'
+    $titleLabel.Font = New-Object System.Drawing.Font('Segoe UI', 22, [System.Drawing.FontStyle]::Bold)
     $titleLabel.ForeColor = $t.Text
     $titleLabel.BackColor = $t.Surface
 
     $subLabel = New-Object System.Windows.Forms.Label
-    $subLabel.Location = New-Object System.Drawing.Point(22, 44)
+    $subLabel.Location = New-Object System.Drawing.Point(26, 78)
     $subLabel.AutoSize = $true
     if ($script:RestoredLastLook) {
         $subLabel.Text = "Your last look is already selected. Change only what you want, then Use this look.  $($themes.Count) colors  ·  $($fonts.Count) fonts  ·  $($arts.Count) art  ·  $(@(Get-FastfetchModuleCatalog).Count) Fastfetch lines  ·  $($poshItems.Count) prompts"
@@ -2325,6 +2418,18 @@ function Show-ChoiceStudio {
     $subLabel.BackColor = $t.Surface
     $header.Controls.Add($titleLabel)
     $header.Controls.Add($subLabel)
+    $brand = New-Object System.Windows.Forms.Label
+    $brand.Text = 'BETTER TERMINAL  /  APPEARANCE STUDIO'
+    $brand.Location = New-Object System.Drawing.Point(26, 14)
+    $brand.AutoSize = $true
+    $brand.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Bold)
+    $brand.ForeColor = $t.Accent
+    $header.Controls.Add($brand)
+    $headerAccent = New-Object System.Windows.Forms.Panel
+    $headerAccent.Dock = 'Left'
+    $headerAccent.Width = 4
+    $headerAccent.BackColor = $t.Accent
+    $header.Controls.Add($headerAccent)
 
     $footer = New-Object System.Windows.Forms.Panel
     $footer.Dock = 'Bottom'
@@ -2373,6 +2478,19 @@ function Show-ChoiceStudio {
 
     $form.AcceptButton = $ok
     $form.CancelButton = $cancel
+    $form.Add_KeyDown({
+        param($sender, $e)
+        if ($e.Control -and $e.KeyCode -eq 'F') {
+            $script:StudioSearch.Focus()
+            $script:StudioSearch.SelectAll()
+            $e.SuppressKeyPress = $true
+        } elseif ($e.Control -and $e.KeyCode -eq 'Tab') {
+            $step = if ($e.Shift) { -1 } else { 1 }
+            $count = $script:StudioTabs.TabCount
+            $script:StudioTabs.SelectedIndex = ($script:StudioTabs.SelectedIndex + $step + $count) % $count
+            $e.SuppressKeyPress = $true
+        }
+    })
 
     $tabs = New-Object System.Windows.Forms.TabControl
     $tabs.Dock = 'Fill'
@@ -2387,13 +2505,20 @@ function Show-ChoiceStudio {
 
     $tabBar = New-Object System.Windows.Forms.Panel
     $tabBar.Dock = 'Top'
-    $tabBar.Height = 52
+    $tabBar.Height = 92
     $tabBar.BackColor = $t.Surface
     $tabBar.Padding = New-Object System.Windows.Forms.Padding(16, 8, 16, 8)
 
-    $tabFlow = New-Object System.Windows.Forms.FlowLayoutPanel
+    $tabFlow = New-Object System.Windows.Forms.TableLayoutPanel
     $tabFlow.Dock = 'Fill'
-    $tabFlow.WrapContents = $false
+    $tabFlow.ColumnCount = 3
+    $tabFlow.RowCount = 2
+    for ($i = 0; $i -lt 3; $i++) {
+        [void]$tabFlow.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle('Percent', (100 / 3))))
+    }
+    for ($i = 0; $i -lt 2; $i++) {
+        [void]$tabFlow.RowStyles.Add((New-Object System.Windows.Forms.RowStyle('Percent', 50)))
+    }
     $tabFlow.BackColor = $t.Surface
     $tabFlow.Padding = New-Object System.Windows.Forms.Padding(0, 0, 0, 0)
 
@@ -2402,9 +2527,11 @@ function Show-ChoiceStudio {
         $tabBtn = New-Object System.Windows.Forms.Button
         $tabBtn.Text = $tabName
         $tabBtn.Tag = $tabName
-        $tabBtn.AutoSize = $true
+        $tabBtn.AutoSize = $false
+        $tabBtn.Dock = 'Fill'
+        $tabBtn.Width = 150
         $tabBtn.MinimumSize = New-Object System.Drawing.Size(96, 34)
-        $tabBtn.Margin = New-Object System.Windows.Forms.Padding(0, 0, 8, 0)
+        $tabBtn.Margin = New-Object System.Windows.Forms.Padding(0, 0, 8, 6)
         $tabBtn.Padding = New-Object System.Windows.Forms.Padding(14, 4, 14, 4)
         $tabBtn.FlatStyle = 'Flat'
         $tabBtn.FlatAppearance.BorderSize = 1
@@ -2459,7 +2586,7 @@ function Show-ChoiceStudio {
         if ($script:ThemeGrid.CurrentRow -and $script:ThemeGrid.CurrentRow.Tag) {
             $script:StudioPlan.Theme = $script:ThemeGrid.CurrentRow.Tag
             Sync-LastLookCache
-            Update-StudioPreview
+            Request-StudioPreview
         }
     })
     $themeTab.Controls.Add($themeGrid)
@@ -2478,7 +2605,7 @@ function Show-ChoiceStudio {
         if ($script:FontGrid.CurrentRow -and $script:FontGrid.CurrentRow.Tag) {
             $script:StudioPlan.Font = $script:FontGrid.CurrentRow.Tag
             Sync-LastLookCache
-            Update-StudioPreview
+            Request-StudioPreview
         }
     })
     $fontGrid.Add_CellFormatting({
@@ -2503,7 +2630,7 @@ function Show-ChoiceStudio {
         if ($script:ArtGrid.CurrentRow -and $script:ArtGrid.CurrentRow.Tag) {
             $script:StudioPlan.Art = $script:ArtGrid.CurrentRow.Tag
             Sync-LastLookCache
-            Update-StudioPreview
+            Request-StudioPreview
         }
         Update-CustomArtButtons
     })
@@ -2541,7 +2668,7 @@ function Show-ChoiceStudio {
         Select-StudioGridRow -Grid $grid -Wanted $entry -Properties @('Id')
         Update-CustomArtButtons
         Sync-LastLookCache
-        Update-StudioPreview
+        Request-StudioPreview
     })
 
     $removeArt = New-StudioButton -Text 'Remove' -Kind 'ghost' -Width 88 -Height 30
@@ -2574,7 +2701,7 @@ function Show-ChoiceStudio {
         if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
         Update-CustomArtButtons
         Sync-LastLookCache
-        Update-StudioPreview
+        Request-StudioPreview
     })
 
     $artHint = New-Object System.Windows.Forms.Label
@@ -2678,7 +2805,7 @@ function Show-ChoiceStudio {
                 Update-LogoColorChips
                 if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
                 Sync-LastLookCache
-                Update-StudioPreview
+                Request-StudioPreview
             })
             $fetchBar.Controls.Add($chip)
             $script:LogoColorButtons += $chip
@@ -2722,7 +2849,7 @@ function Show-ChoiceStudio {
             Update-FastfetchGridChecks
             if ($script:FetchPreviewCache) { $script:FetchPreviewCache.Clear() }
             Sync-LastLookCache
-            Update-StudioPreview
+            Request-StudioPreview
         })
         $quickFlow.Controls.Add($preset)
     }
@@ -2755,7 +2882,7 @@ function Show-ChoiceStudio {
         if ($script:PoshGrid.CurrentRow -and $script:PoshGrid.CurrentRow.Tag) {
             $script:StudioPlan.Posh = $script:PoshGrid.CurrentRow.Tag
             Sync-LastLookCache
-            Update-StudioPreview
+            Request-StudioPreview
         }
     })
     $poshGrid.Add_CellFormatting({
@@ -2849,7 +2976,7 @@ function Show-ChoiceStudio {
         if (-not $script:StudioReady) { return }
         $script:StudioPlan.UseAcrylic = $script:GlassBlur.Checked
         Sync-LastLookCache
-        Update-StudioPreview
+        Request-StudioPreview
     })
     $glassWrap.Controls.Add($blur)
     $glassWrap.Controls.Add($slideBox)
@@ -2907,9 +3034,16 @@ function Show-ChoiceStudio {
     })
 
     $searchNote = New-Object System.Windows.Forms.Label
-    $searchNote.Text = 'Clears when you change tabs'
+    $searchNote.Text = ''
     $searchNote.Location = New-Object System.Drawing.Point(632, 46)
-    $searchNote.AutoSize = $true
+    $searchNote.AutoSize = $false
+    $searchNote.Anchor = 'Top,Right'
+    $searchNote.Location = New-Object System.Drawing.Point(380, 82)
+    $searchNote.Width = 140
+    $searchNote.Height = 24
+    $searchNote.TextAlign = 'MiddleRight'
+    $searchNote.Padding = New-Object System.Windows.Forms.Padding(0, 0, 20, 0)
+    $searchNote.Font = New-Object System.Drawing.Font('Segoe UI', 9)
     $searchNote.ForeColor = $t.Muted
     $searchNote.BackColor = $t.Surface
 
@@ -2920,9 +3054,28 @@ function Show-ChoiceStudio {
     $searchBar.Controls.Add($clearSearch)
     $searchBar.Controls.Add($searchNote)
     $searchCue.BringToFront()
+    # A separate caption stays readable in both Windows PowerShell and PowerShell 7.
+    $searchCue.Location = New-Object System.Drawing.Point(20, 84)
+    $searchCue.BackColor = $t.Surface
+    $searchCue.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $searchCue.BringToFront()
+    $searchBar.Height = 110
+    $searchBar.Tag = @($searchShell, $clearSearch, $guide, $searchCue, $searchNote)
+    $searchBar.Add_Resize({
+        $parts = $this.Tag
+        $parts[1].Left = [Math]::Max(180, $this.ClientSize.Width - 92)
+        $parts[0].Width = [Math]::Max(140, $parts[1].Left - 32)
+        $parts[2].Width = [Math]::Max(140, $this.ClientSize.Width - 40)
+        $parts[3].MaximumSize = New-Object System.Drawing.Size(([Math]::Max(100, $parts[0].Width - 100)), 24)
+        $parts[4].Left = [Math]::Max(240, $this.ClientSize.Width - 160)
+    })
 
-    $searchBox.Add_TextChanged({ Update-StudioSearch })
-    $searchBox.Add_GotFocus({ if ($script:StudioSearchCue) { $script:StudioSearchCue.Visible = $false } })
+    $searchBox.Add_TextChanged({
+        Update-StudioChrome
+        $script:StudioSearchTimer.Stop()
+        $script:StudioSearchTimer.Start()
+    })
+    $searchBox.Add_GotFocus({ Update-StudioChrome })
     $searchBox.Add_LostFocus({ Update-StudioChrome })
     $searchBox.Add_KeyDown({
         param($s, $e)
@@ -2932,7 +3085,7 @@ function Show-ChoiceStudio {
         }
     })
     $desktop = New-Object System.Windows.Forms.Panel
-    $desktop.Dock = 'Top'
+    $desktop.Dock = 'Fill'
     $desktop.Height = 318
     $desktop.BackColor = $t.Wall
     $desktop.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 10)
@@ -2943,13 +3096,21 @@ function Show-ChoiceStudio {
 
     $title = New-Object System.Windows.Forms.Label
     $title.Dock = 'Top'
-    $title.Height = 22
+    $title.Height = 42
+    $title.AutoEllipsis = $true
     $title.TextAlign = 'MiddleLeft'
     $title.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $title.ForeColor = [System.Drawing.Color]::FromArgb(200, 210, 230)
     $title.Text = '  Live preview'
     $title.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
     $title.Padding = New-Object System.Windows.Forms.Padding(8, 0, 0, 0)
+    $previewMeta = New-Object System.Windows.Forms.Label
+    $previewMeta.Dock = 'Top'
+    $previewMeta.Height = 38
+    $previewMeta.TextAlign = 'MiddleLeft'
+    $previewMeta.Padding = New-Object System.Windows.Forms.Padding(12, 0, 8, 0)
+    $previewMeta.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $previewMeta.AutoEllipsis = $true
 
     $promptName = New-Object System.Windows.Forms.Label
     $promptName.Visible = $false
@@ -2957,13 +3118,13 @@ function Show-ChoiceStudio {
 
     $promptStrip = New-Object System.Windows.Forms.Panel
     $promptStrip.Dock = 'Bottom'
-    $promptStrip.Height = 44
+    $promptStrip.Height = 62
     $promptStrip.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $promptStrip.Padding = New-Object System.Windows.Forms.Padding(2, 1, 2, 1)
 
     $fontSample = New-Object System.Windows.Forms.Label
     $fontSample.Dock = 'Bottom'
-    $fontSample.Height = 22
+    $fontSample.Height = 36
     $fontSample.TextAlign = 'MiddleLeft'
     $fontSample.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $fontSample.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 228)
@@ -2974,14 +3135,27 @@ function Show-ChoiceStudio {
 
     $swatch = New-Object System.Windows.Forms.FlowLayoutPanel
     $swatch.Dock = 'Bottom'
-    $swatch.Height = 20
+    $swatch.Height = 38
     $swatch.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $swatch.Padding = New-Object System.Windows.Forms.Padding(6, 1, 6, 1)
+    $previewTools = New-Object System.Windows.Forms.Panel
+    $previewTools.Dock = 'Bottom'
+    $previewTools.Height = 34
+    $previewTools.BackColor = $t.Surface2
+    $fitPreview = New-Object System.Windows.Forms.CheckBox
+    $fitPreview.Text = 'Fit preview to panel'
+    $fitPreview.Checked = $true
+    $fitPreview.AutoSize = $true
+    $fitPreview.Location = New-Object System.Drawing.Point(14, 8)
+    $fitPreview.ForeColor = $t.Text
+    $fitPreview.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $fitPreview.Add_CheckedChanged({ Update-StudioPreviewFit })
+    $previewTools.Controls.Add($fitPreview)
 
     $cols = New-Object System.Windows.Forms.Panel
     $cols.Dock = 'Fill'
     $cols.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
-    $cols.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 4)
+    $cols.Padding = New-Object System.Windows.Forms.Padding(20, 18, 20, 12)
 
     $artBox = New-Object System.Windows.Forms.TextBox
     $artBox.Dock = 'Fill'
@@ -2995,6 +3169,8 @@ function Show-ChoiceStudio {
     $artBox.BackColor = [System.Drawing.Color]::FromArgb(12, 12, 16)
     $artBox.ForeColor = [System.Drawing.Color]::FromArgb(220, 220, 228)
     $artBox.Text = '  Fastfetch will show here.'
+    $artBox.AccessibleName = 'Live terminal output preview'
+    $artBox.Add_Resize({ Update-StudioPreviewFit })
     $infoBox = New-Object System.Windows.Forms.Label
     $infoBox.Visible = $false
     $infoBox.Height = 0
@@ -3004,13 +3180,63 @@ function Show-ChoiceStudio {
     $preview.Controls.Add($fontSample)
     $preview.Controls.Add($promptStrip)
     $preview.Controls.Add($swatch)
+    $preview.Controls.Add($previewMeta)
     $preview.Controls.Add($title)
+    $preview.Controls.Add($previewTools)
     $desktop.Controls.Add($preview)
 
-    $form.Controls.Add($tabs)
-    $form.Controls.Add($tabBar)
-    $form.Controls.Add($searchBar)
-    $form.Controls.Add($desktop)
+    $workspace = New-Object System.Windows.Forms.SplitContainer
+    $workspace.Dock = 'Fill'
+    $workspace.Size = New-Object System.Drawing.Size(1400, 650)
+    $workspace.BackColor = $t.Bg
+    $workspace.SplitterWidth = 10
+    $workspace.Panel1MinSize = 480
+    $workspace.Panel2MinSize = 540
+    $workspace.SplitterDistance = 740
+    $workspace.Panel1.Padding = New-Object System.Windows.Forms.Padding(18, 18, 0, 18)
+    $workspace.Panel2.Padding = New-Object System.Windows.Forms.Padding(0, 18, 18, 18)
+    $workspace.Panel1.Controls.Add($desktop)
+    # Clip the native TabControl frame; navigation uses the responsive buttons above.
+    $tabHost = New-Object System.Windows.Forms.Panel
+    $tabHost.Dock = 'Fill'
+    $tabHost.BackColor = $t.GridBg
+    $tabs.Dock = 'None'
+    $tabs.Location = New-Object System.Drawing.Point(-4, -5)
+    $tabHost.Controls.Add($tabs)
+    $tabHost.Tag = $tabs
+    $tabHost.Add_Resize({
+        $this.Tag.Size = New-Object System.Drawing.Size(($this.ClientSize.Width + 8), ($this.ClientSize.Height + 9))
+    })
+    $workspace.Panel2.Controls.Add($tabHost)
+    $workspace.Panel2.Controls.Add($searchBar)
+    $workspace.Panel2.Controls.Add($tabBar)
+    $customizeTitle = New-Object System.Windows.Forms.Label
+    $customizeTitle.Dock = 'Top'
+    $customizeTitle.Height = 38
+    $customizeTitle.Text = '  MAKE IT YOURS'
+    $customizeTitle.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+    $customizeTitle.ForeColor = $t.Muted
+    $customizeTitle.TextAlign = 'MiddleLeft'
+    $workspace.Panel2.Controls.Add($customizeTitle)
+    $emptyState = New-Object System.Windows.Forms.Label
+    $emptyState.Dock = 'Fill'
+    $emptyState.Text = "No matching options`r`nTry another search or click Clear."
+    $emptyState.TextAlign = 'MiddleCenter'
+    $emptyState.BackColor = $t.GridBg
+    $emptyState.ForeColor = $t.Muted
+    $emptyState.Visible = $false
+    foreach ($page in $tabs.TabPages) { $page.Padding = New-Object System.Windows.Forms.Padding(8) }
+    $searchShell.Width = 360
+    $searchCue.MaximumSize = New-Object System.Drawing.Size(260, 24)
+    $clearSearch.Left = 390
+    $guide.AutoSize = $false
+    $guide.Size = New-Object System.Drawing.Size(480, 28)
+    $guide.AutoEllipsis = $true
+    $subLabel.Text = 'A workspace that feels like you. Explore a look, then apply it when you are ready.'
+    $subLabel.AutoSize = $false
+    $subLabel.Size = New-Object System.Drawing.Size(1000, 24)
+    $subLabel.Anchor = 'Top,Left,Right'
+    $form.Controls.Add($workspace)
     $form.Controls.Add($footer)
     $form.Controls.Add($header)
 
@@ -3022,6 +3248,11 @@ function Show-ChoiceStudio {
     $tips.SetToolTip($clearSearch, 'Clear the search box')
     $tips.SetToolTip($addArt, 'Save your own ASCII picture')
     $tips.SetToolTip($removeArt, 'Delete a picture you added')
+    $tips.SetToolTip($fitPreview, 'Fit the preview text to this panel. Turn off for a larger, scrollable view.')
+    $searchBox.AccessibleName = 'Search customization options'
+    $searchBox.AccessibleDescription = 'Ctrl+F focuses search. Ctrl+Tab switches customization tabs.'
+    $fitPreview.AccessibleName = 'Fit terminal preview text to panel'
+    foreach ($button in $script:StudioTabButtons) { $button.AccessibleName = [string]$button.Tag }
     foreach ($chip in @($script:LogoColorButtons)) {
         if ($chip -and $chip.Tag) { $tips.SetToolTip($chip, [string]$chip.Tag.Name) }
     }
@@ -3031,6 +3262,8 @@ function Show-ChoiceStudio {
     $script:StudioCancelButton = $cancel
     $script:StudioGuide = $guide
     $script:StudioSearchCue = $searchCue
+    $script:StudioSearchNote = $searchNote
+    $script:StudioEmptyState = $emptyState
     $script:ThemeGrid = $themeGrid
     $script:FontGrid = $fontGrid
     $script:ArtGrid = $artGrid
@@ -3038,7 +3271,14 @@ function Show-ChoiceStudio {
     $script:PoshGrid = $poshGrid
     $script:StudioTabs = $tabs
     $script:StudioSearch = $searchBox
+    $script:StudioFilteredGrid = $themeGrid
     $tabs.Add_SelectedIndexChanged({
+        Filter-ClickTable -Grid $script:StudioFilteredGrid -Query ''
+        $script:StudioFilteredGrid = Get-CurrentStudioGrid
+        $script:StudioEmptyState.Visible = $false
+        if ($script:StudioFilteredGrid) {
+            $script:StudioTabs.SelectedTab.Controls.Add($script:StudioEmptyState)
+        } else { $script:StudioSearchNote.Text = 'Adjust the transparency below' }
         if ($script:StudioSearch -and $script:StudioSearch.Text) {
             $script:StudioSearch.Text = ''
         }
@@ -3051,6 +3291,8 @@ function Show-ChoiceStudio {
         Desktop     = $desktop
         Preview     = $preview
         Title       = $title
+        Meta        = $previewMeta
+        Fit         = $fitPreview
         Art         = $artBox
         Info        = $infoBox
         PromptStrip = $promptStrip
@@ -3060,6 +3302,51 @@ function Show-ChoiceStudio {
         Picks       = $picks
     }
 
+    $script:StudioPreviewDirty = $false
+    $themeTab.Controls.Add($emptyState)
+    foreach ($surface in @($workspace, $desktop, $preview, $cols, $tabFlow, $tabHost, $header, $footer)) {
+        Enable-StudioDoubleBuffer $surface
+    }
+    $script:StudioPreviewTimer = New-Object System.Windows.Forms.Timer
+    $script:StudioPreviewTimer.Interval = 120
+    $script:StudioPreviewTimer.Add_Tick({
+        if (-not $script:StudioReady) { return }
+        if ($script:StudioPreviewDirty) {
+            $script:StudioPreviewDirty = $false
+            Update-StudioPreview
+        } elseif ($script:PreviewProcess) {
+            $text = Get-FastfetchFullPreview -Art $script:StudioPlan.Art
+            Set-StudioPreviewText $text
+        } else { $script:StudioPreviewTimer.Stop() }
+    })
+    $script:StudioSearchTimer = New-Object System.Windows.Forms.Timer
+    $script:StudioSearchTimer.Interval = 180
+    $script:StudioSearchTimer.Add_Tick({
+        $script:StudioSearchTimer.Stop()
+        Update-StudioSearch
+    })
+    $form.Add_FormClosed({
+        $script:StudioReady = $false
+        $script:StudioPreviewTimer.Stop()
+        $script:StudioPreviewTimer.Dispose()
+        $script:StudioSearchTimer.Stop()
+        $script:StudioSearchTimer.Dispose()
+        if ($script:PreviewProcess) {
+            try { if (-not $script:PreviewProcess.HasExited) { $script:PreviewProcess.Kill() } } catch {}
+            $script:PreviewProcess.Dispose()
+            $script:PreviewProcess = $null
+        }
+        if ($script:StudioPreviewDirectory) {
+            foreach ($name in @('fastfetch.jsonc', 'logo.txt')) {
+                $path = Join-Path $script:StudioPreviewDirectory $name
+                if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue }
+            }
+            # Non-recursive: never remove unrelated files or follow a directory tree.
+            try { [IO.Directory]::Delete($script:StudioPreviewDirectory, $false) } catch {}
+            $script:StudioPreviewDirectory = $null
+        }
+        $tips.Dispose()
+    })
     $form.Add_Shown({
         try {
             $script:StudioReady = $false
@@ -3080,6 +3367,7 @@ function Show-ChoiceStudio {
             Select-StudioGridRow -Grid $script:PoshGrid -Wanted $script:StudioPlan.Posh -Properties @('Id', 'Label')
             Update-FastfetchGridChecks
             Update-LogoColorChips
+            Update-StudioSearch
             Update-StudioChrome
             if ($script:StudioOkButton -and $script:StudioOkButton.Parent) {
                 $bar = $script:StudioOkButton.Parent
@@ -3093,7 +3381,7 @@ function Show-ChoiceStudio {
             }
             $script:StudioReady = $true
             Update-CustomArtButtons
-            Update-StudioPreview
+            Request-StudioPreview
         } catch {
             $script:StudioReady = $true
         }
@@ -3104,6 +3392,8 @@ function Show-ChoiceStudio {
     } catch {
         Write-Color "  The picker could not stay open: $($_.Exception.Message)" '#F38BA8'
         return $null
+    } finally {
+        $form.Dispose()
     }
 
     if ($script:StudioResult -ne 'ok') { return $null }
@@ -3258,7 +3548,7 @@ function Invoke-WingetInstall {
     $winget = Get-WingetCommand
     if (-not $winget) { return $false }
     Write-Color "  Installing $DisplayName with winget ($PackageId)..." '#89B4FA'
-    & $winget install --id $PackageId -e --accept-package-agreements --accept-source-agreements --disable-interactivity
+    & $winget install --id $PackageId -e --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
     Update-SessionPath
     return ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq -1978335189)
 }
@@ -3973,6 +4263,25 @@ function Get-ArtPreviewText {
 function Get-FastfetchFullPreview {
     param($Art)
     if (-not $Art) { return '  Fastfetch will show here.' }
+    # Collect an earlier request only after the process and both output reads finish.
+    if ($script:PreviewProcess) {
+        $process = $script:PreviewProcess
+        if ($process.HasExited -and $script:PreviewOutput.IsCompleted -and $script:PreviewError.IsCompleted) {
+            $result = Strip-AnsiText ($script:PreviewOutput.Result)
+            if ($process.ExitCode -eq 0 -and -not [string]::IsNullOrWhiteSpace($result)) {
+                $script:FetchPreviewCache[$script:PreviewProcessKey] = $result.TrimEnd()
+            } else {
+                $script:FetchPreviewCache[$script:PreviewProcessKey] = 'Preview unavailable. Select another logo or retry setup.'
+            }
+            $process.Dispose()
+            $script:PreviewProcess = $null
+        } elseif (((Get-Date) - $script:PreviewStarted).TotalSeconds -gt 5) {
+            try { $process.Kill() } catch {}
+            $process.Dispose()
+            $script:FetchPreviewCache[$script:PreviewProcessKey] = 'Preview timed out. Your selected look can still be saved.'
+            $script:PreviewProcess = $null
+        }
+    }
     $modKey = ''
     $colorKey = ''
     if ($script:StudioPlan) {
@@ -3986,13 +4295,18 @@ function Get-FastfetchFullPreview {
         return $script:FetchPreviewCache[$key]
     }
     if (-not $script:FetchPreviewCache) { $script:FetchPreviewCache = @{} }
+    if ($script:PreviewProcess) { return 'Updating terminal preview...' }
 
     $text = $null
     if (Test-CommandExists 'fastfetch') {
         $ffArgs = @('--pipe')
         $kind = [string]$Art.Kind
         $name = if ($Art.Source) { [string]$Art.Source } else { [string]$Art.Label }
-        $previewCfg = Join-Path $env:TEMP 'better-terminal-preview-fastfetch.jsonc'
+        if (-not $script:StudioPreviewDirectory) {
+            $script:StudioPreviewDirectory = Join-Path ([IO.Path]::GetTempPath()) ('BetterTerminal-' + [guid]::NewGuid().ToString('N'))
+            [void][IO.Directory]::CreateDirectory($script:StudioPreviewDirectory)
+        }
+        $previewCfg = Join-Path $script:StudioPreviewDirectory 'fastfetch.jsonc'
         $logoType = 'auto'
         $logoSource = $null
         $logoFile = $null
@@ -4008,7 +4322,7 @@ function Get-FastfetchFullPreview {
             $logoSource = $name
         } else {
             Ensure-ArtLines $Art
-            $logoFile = Join-Path $env:TEMP 'better-terminal-preview-logo.txt'
+            $logoFile = Join-Path $script:StudioPreviewDirectory 'logo.txt'
             Write-Utf8NoBom -Path $logoFile -Text (((@($Art.Lines) -join "`n") + "`n"))
             $logoType = 'file'
             $logoSource = $logoFile.Replace('\', '/')
@@ -4027,18 +4341,32 @@ $moduleJson
 "@
         Write-Utf8NoBom -Path $previewCfg -Text $previewText
         $ffArgs = @('--config', $previewCfg, '--pipe')
-        $out = @()
-        try { $out = @(& fastfetch @ffArgs 2>$null) } catch { $out = @() }
-        $lines = @($out | ForEach-Object { Strip-AnsiText $_ })
-        while ($lines.Count -gt 0 -and [string]::IsNullOrWhiteSpace($lines[$lines.Count - 1])) {
-            $lines = @($lines | Select-Object -First ($lines.Count - 1))
+        try {
+            $start = New-Object System.Diagnostics.ProcessStartInfo
+            $start.FileName = (Get-Command fastfetch -CommandType Application -ErrorAction Stop).Source
+            $start.Arguments = '--config "' + $previewCfg + '" --pipe'
+            $start.UseShellExecute = $false
+            $start.CreateNoWindow = $true
+            $start.RedirectStandardOutput = $true
+            $start.RedirectStandardError = $true
+            $start.StandardOutputEncoding = [Text.Encoding]::UTF8
+            $process = New-Object System.Diagnostics.Process
+            $process.StartInfo = $start
+            [void]$process.Start()
+            $script:PreviewOutput = $process.StandardOutput.ReadToEndAsync()
+            $script:PreviewError = $process.StandardError.ReadToEndAsync()
+            $script:PreviewProcessKey = $key
+            $script:PreviewStarted = Get-Date
+            $script:PreviewProcess = $process
+            return 'Loading your terminal preview...'
+        } catch {
+            if ($process) { $process.Dispose() }
         }
-        if ($lines.Count -gt 0) { $text = $lines -join [Environment]::NewLine }
     }
 
     if ([string]::IsNullOrWhiteSpace($text)) {
         Ensure-ArtLines $Art
-        $hw = Get-StudioHardwareInfo
+        $hw = Get-StudioHardwareInfo -Lightweight
         $info = @(
             "$($env:USERNAME)@$($env:COMPUTERNAME)"
             "OS        $($hw.OS)"
@@ -4308,7 +4636,7 @@ function Save-LastLook {
 
 function Sync-LastLookCache {
     if (-not $script:StudioReady) { return }
-    if ($script:StudioPlan) { Save-LastLook -Plan $script:StudioPlan }
+    # Changes remain in memory until Use this look is selected.
 }
 
 function Test-LookPropertyMatch {
@@ -4436,48 +4764,8 @@ function Install-OhMyPoshPackage {
     Update-SessionPath
     if (Test-CommandExists 'oh-my-posh') { return $true }
 
-    Write-Color '  winget could not do it. Downloading the official program instead...' '#F9E2AF'
-    return (Install-OhMyPoshBinary)
-}
-
-function Add-UserPathEntry {
-    param([string]$Folder)
-    if ([string]::IsNullOrWhiteSpace($Folder)) { return }
-    $user = [Environment]::GetEnvironmentVariable('Path', 'User')
-    if ($null -eq $user) { $user = '' }
-    $parts = @($user -split ';' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    foreach ($part in $parts) {
-        if ($part.TrimEnd('\') -eq $Folder.TrimEnd('\')) { return }
-    }
-    [Environment]::SetEnvironmentVariable('Path', ((@($parts) + @($Folder)) -join ';'), 'User')
-}
-
-function Install-OhMyPoshBinary {
-    # Save the official signed program to disk and run it from there.
-    # The helper never downloads code and runs it straight from memory.
-    $arch = 'amd64'
-    if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64' -or $env:PROCESSOR_ARCHITEW6432 -eq 'ARM64') { $arch = 'arm64' }
-    $url = "$script:OhMyPoshReleaseUrl/posh-windows-$arch.exe"
-    $dir = Join-Path $env:LOCALAPPDATA 'Programs\oh-my-posh\bin'
-    $exe = Join-Path $dir 'oh-my-posh.exe'
-
-    Write-Color "  From: $url" '#89B4FA'
-    try {
-        New-Item -ItemType Directory -Force -Path $dir | Out-Null
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri $url -OutFile $exe -UseBasicParsing -TimeoutSec 180
-    } catch {
-        Write-Color "  Could not download Oh My Posh: $($_.Exception.Message)" '#F38BA8'
-        return $false
-    }
-
-    Add-UserPathEntry -Folder $dir
-    Update-SessionPath
-    if ($env:Path -notlike "*$dir*") { $env:Path = "$env:Path;$dir" }
-    if (Test-CommandExists 'oh-my-posh') {
-        Write-Color "  Oh My Posh saved to $exe" '#A6E3A1'
-        return $true
-    }
+    Write-Color '  Oh My Posh was not installed. Install or repair App Installer (WinGet), then retry.' '#F9E2AF'
+    Write-Color '  No unverified executable download will be used as a fallback.' '#F9E2AF'
     return $false
 }
 
@@ -4584,38 +4872,9 @@ function Install-FastfetchPackage {
     Update-SessionPath
     if (Test-CommandExists 'fastfetch') { return $true }
 
-    Write-Color '  Trying a direct download from GitHub instead...' '#F9E2AF'
-    try {
-        $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest' -Headers @{ 'User-Agent' = 'BetterTerminalSetup' }
-        $asset = $release.assets | Where-Object { $_.name -match 'windows-amd64\.zip$' } | Select-Object -First 1
-        if (-not $asset) {
-            Write-Color '  No windows-amd64 zip found on the latest release.' '#F38BA8'
-            return $false
-        }
-        Write-Color "  From: $($asset.browser_download_url)" '#89B4FA'
-        $temp = Join-Path $env:TEMP 'better-terminal-fastfetch'
-        New-Item -ItemType Directory -Force -Path $temp | Out-Null
-        $zip = Join-Path $temp $asset.name
-        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zip -UseBasicParsing
-        $extract = Join-Path $temp 'extracted'
-        if (Test-Path $extract) { Remove-Item $extract -Recurse -Force }
-        Expand-Archive -Path $zip -DestinationPath $extract -Force
-        $exe = Get-ChildItem -Path $extract -Recurse -Filter 'fastfetch.exe' | Select-Object -First 1
-        if (-not $exe) { throw 'fastfetch.exe missing from the archive.' }
-        $destDir = Join-Path $env:LOCALAPPDATA 'Programs\fastfetch'
-        New-Item -ItemType Directory -Force -Path $destDir | Out-Null
-        Copy-Item $exe.FullName (Join-Path $destDir 'fastfetch.exe') -Force
-        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-        if ($userPath -notlike "*$destDir*") {
-            [Environment]::SetEnvironmentVariable('Path', "$userPath;$destDir", 'User')
-        }
-        Update-SessionPath
-        Write-Color "  Fastfetch $($release.tag_name) installed to $destDir" '#A6E3A1'
-        return $true
-    } catch {
-        Write-Color "  Fastfetch install failed: $($_.Exception.Message)" '#F38BA8'
-        return $false
-    }
+    Write-Color '  Fastfetch was not installed. Install or repair App Installer (WinGet), then retry.' '#F9E2AF'
+    Write-Color '  No unverified executable download will be used as a fallback.' '#F9E2AF'
+    return $false
 }
 
 function Install-TerminalIconsPackage {
@@ -4635,7 +4894,7 @@ function Install-TerminalIconsPackage {
             Write-Color '  Installing the NuGet package provider (needed for PowerShell Gallery)...' '#89B4FA'
             Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser -ErrorAction Stop | Out-Null
         }
-        Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser -Force -AllowClobber -SkipPublisherCheck -ErrorAction Stop
+        Install-Module -Name Terminal-Icons -Repository PSGallery -Scope CurrentUser -Force -ErrorAction Stop
         if (Get-Module -ListAvailable -Name Terminal-Icons -ErrorAction SilentlyContinue) {
             Write-Color '  Terminal-Icons installed from the PowerShell Gallery.' '#A6E3A1'
             return $true
@@ -4669,7 +4928,10 @@ function Set-WtAppearanceMembers {
     }
     $usableFace = Get-UsableFontFace $State.Font
     if ($usableFace) {
-        $Target | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{ face = $usableFace }) -Force
+        if (-not $Target.font) {
+            $Target | Add-Member -NotePropertyName font -NotePropertyValue ([pscustomobject]@{}) -Force
+        }
+        $Target.font | Add-Member -NotePropertyName face -NotePropertyValue $usableFace -Force
     }
     if ($State.ApplyTransparency) {
         $Target | Add-Member -NotePropertyName opacity -NotePropertyValue ([int]$State.Opacity) -Force
@@ -5069,8 +5331,7 @@ function Get-ScriptPolicyBlocker {
 }
 
 function Get-NewWindowPolicy {
-    # This helper is started with -ExecutionPolicy Bypass, so its own policy says Bypass.
-    # A brand new PowerShell window has no Process policy, so skip that scope here.
+    # A new PowerShell window does not inherit a session's Process policy.
     $map = @{}
     try {
         foreach ($row in @(Get-ExecutionPolicy -List)) {
@@ -5106,82 +5367,20 @@ function Test-NewWindowScripts {
     return ($value -ne 'Restricted' -and $value -ne 'AllSigned')
 }
 
-function Set-UserScriptPolicy {
-    $done = $false
-    try {
-        Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
-        $done = $true
-    } catch {
-        Write-Color "  The usual way was refused: $($_.Exception.Message)" '#F9E2AF'
-    }
-
-    if (-not $done) {
-        # Write the same value the command writes, under your own account only.
-        try {
-            $key = 'HKCU:\Software\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
-            if (-not (Test-Path $key)) { New-Item -Path $key -Force | Out-Null }
-            New-ItemProperty -Path $key -Name 'ExecutionPolicy' -Value 'RemoteSigned' -PropertyType String -Force | Out-Null
-            Write-Color '  Set it straight in your own account settings instead.' '#A6E3A1'
-            $done = $true
-        } catch {
-            Write-Color "  That was refused too: $($_.Exception.Message)" '#F38BA8'
-        }
-    }
-
-    # PowerShell 7 keeps its own copy of this setting.
-    if (Test-CommandExists 'pwsh') {
-        try {
-            & pwsh -NoProfile -NonInteractive -Command 'Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force' 2>$null | Out-Null
-        } catch {}
-    }
-    return $done
-}
-
 function Enable-ProfileScripts {
     if ($script:ScriptPolicyChecked) { return -not $script:ScriptsBlocked }
     $script:ScriptPolicyChecked = $true
-    $script:ScriptsBlocked = $false
+    $script:ScriptsBlocked = -not (Test-NewWindowScripts)
+    if (-not $script:ScriptsBlocked) { return $true }
 
-    if (Test-NewWindowScripts) { return $true }
-
-    Write-Host ""
-    Write-Color '  This PC blocks PowerShell scripts, so your new prompt would not start.' '#F9E2AF'
-
+    Write-Color '  PowerShell policy blocks unsigned profiles. Your policy has not been changed.' '#F9E2AF'
     $blocker = Get-ScriptPolicyBlocker
     if ($blocker) {
-        $script:ScriptsBlocked = $true
-        Write-Color "  A Windows policy ($blocker) is doing this, so the helper cannot change it." '#F38BA8'
-        Write-Color '  Ask whoever manages this PC to allow RemoteSigned scripts.' '#89B4FA'
-        return $false
+        Write-Color "  Policy is managed by $blocker. Contact your administrator." '#F9E2AF'
+    } else {
+        Write-Color '  Review the script policy guidance in README.md before enabling profiles.' '#89B4FA'
     }
-
-    Write-Color '  Allowing scripts for your account only. No administrator needed.' '#CBA6F7'
-    Write-Color '  Same as running: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
-    [void](Set-UserScriptPolicy)
-
-    if (Test-NewWindowScripts -Spawn) {
-        Write-Color '  Done. A new PowerShell window can run your prompt now.' '#A6E3A1'
-        return $true
-    }
-
-    $script:ScriptsBlocked = $true
-    Write-Color '  Scripts are still blocked on this PC.' '#F38BA8'
-    Write-Color '  Open PowerShell and run this one line, answer Y, then run this helper again:' '#F9E2AF'
-    Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
     return $false
-}
-
-function Unblock-HelperFiles {
-    # Files copied from a zip or a download keep a "came from the internet" mark.
-    # Under RemoteSigned that mark alone stops the helper from running.
-    $here = $PSScriptRoot
-    if ([string]::IsNullOrWhiteSpace($here)) { return }
-    foreach ($name in @('Install-BetterTerminal.ps1', 'Start-BetterTerminal.cmd')) {
-        $path = Join-Path $here $name
-        if (Test-Path $path) {
-            try { Unblock-File -Path $path -ErrorAction SilentlyContinue } catch {}
-        }
-    }
 }
 
 function Set-PowerShellProfileLook {
@@ -5196,7 +5395,8 @@ function Set-PowerShellProfileLook {
             $safe = $themeFile.Replace("'", "''")
             $poshLine = "oh-my-posh init pwsh --config '$safe' | Invoke-Expression"
         } else {
-            $poshLine = "oh-my-posh init pwsh --config '$($State.Posh.Id)' | Invoke-Expression"
+            $safe = ([string]$State.Posh.Id).Replace("'", "''")
+            $poshLine = "oh-my-posh init pwsh --config '$safe' | Invoke-Expression"
         }
     }
 
@@ -5267,7 +5467,6 @@ $fastfetchLine
         $existing = [regex]::Replace($existing, '(?m)^(\s*fastfetch --config \$eagleFastfetchConfig.*)$', '# Better Terminal now draws Fastfetch. Old line: $1')
 
         Set-Content -Path $profilePath -Value ($existing.TrimEnd() + $block) -Encoding UTF8
-        try { Unblock-File -Path $profilePath -ErrorAction SilentlyContinue } catch {}
         Write-Color "  PowerShell profile updated: $profilePath" '#A6E3A1'
     }
 }
@@ -5686,9 +5885,8 @@ function Show-DoneScreen {
     if ($script:ScriptsBlocked) {
         Write-Color '  One thing still needs you' '#F38BA8'
         Write-Color '  This PC blocks PowerShell scripts, so the new prompt cannot start by itself.' '#F9E2AF'
-        Write-Color '  Open PowerShell and run this one line:' '#C0CAF5'
-        Write-Color '    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned' '#89B4FA'
-        Write-Color '  Answer Y, then open a new terminal. Colors and the font already work without it.' '#C0CAF5'
+        Write-Color '  Review the script policy guidance in README.md or contact your administrator.' '#C0CAF5'
+        Write-Color '  Colors and the font already work without loading a PowerShell profile.' '#C0CAF5'
         Write-Host ""
     }
 
@@ -5715,8 +5913,6 @@ function Show-DoneScreen {
 function Start-BetterTerminalSetup {
     Enable-VirtualTerminal
     [void](Enable-ProfileScripts)
-    Unblock-HelperFiles
-    Clear-MissingEditorFonts
 
     try {
         $plan = Get-InstallPlan
@@ -5726,6 +5922,7 @@ function Start-BetterTerminalSetup {
             return
         }
 
+        Clear-MissingEditorFonts
         $failed = Invoke-DownloadEverything -Plan $plan
 
         $plan.Theme = Get-PreferredCatalogItem -Items (Get-ThemeCatalog) -Names @('Dracula', 'TokyoNight', 'Catppuccin Mocha', 'Nord') -Property 'name'

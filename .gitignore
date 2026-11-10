@@ -1,0 +1,7 @@
+# Ignore everything except the four project files and these ignore rules.
+/*
+!/.gitignore
+!/Install-BetterTerminal.ps1
+!/README.md
+!/Start-BetterTerminal.cmd
+!/CATALOG.md

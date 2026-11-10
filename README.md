@@ -21,10 +21,18 @@ This file explains **what the helper does**, **where every piece of data comes f
 Or in PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\Install-BetterTerminal.ps1
+powershell -NoProfile -File .\Install-BetterTerminal.ps1
 ```
 
-If Windows asks about running a script, choose **Yes**.
+The launcher respects your existing PowerShell execution policy. Review the installer before allowing it to run; see the script policy guidance below if Windows blocks it.
+
+### Script policy and antivirus reports
+
+This helper does not change execution policy, edit policy registry keys, remove internet-origin marks, or disable antivirus protection. Executable tools install through the explicit WinGet source with its normal integrity checks. If WinGet fails, that tool is reported as unfinished rather than downloaded through an unchecked fallback. Terminal-Icons installs without skipping publisher checks.
+
+On a personal PC, if you decide to allow local scripts after reviewing this code, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` yourself and confirm the prompt. This affects other scripts for your account too. Under RemoteSigned, an unsigned downloaded script may also require manual review and approval through its file Properties > Unblock. Keep managed policies intact; ask your administrator on a managed PC. Under AllSigned, use a script signed by a trusted publisher.
+
+A single VirusTotal detection can be a false positive, but the count alone does not prove safety. Check the detecting vendor and detection name. Rescan the modified file; a clean result is not guaranteed. If the detection is confirmed to be incorrect, submit it to the detecting vendor: https://docs.virustotal.com/docs/false-positive
 
 At the first screen:
 
@@ -43,7 +51,7 @@ At the first screen:
 `Start-BetterTerminal.cmd` runs:
 
 ```bat
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File Install-BetterTerminal.ps1
+powershell.exe -NoProfile -File Install-BetterTerminal.ps1
 ```
 
 The script then:
@@ -68,8 +76,8 @@ The helper builds a plan. With **Y**, that plan is:
 
 | Step | What is installed or downloaded | Official source |
 | --- | --- | --- |
-| Oh My Posh | The prompt program | winget `JanDeDobbeleer.OhMyPosh`, or the signed `posh-windows-amd64.exe` from the [latest GitHub release](https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest) |
-| Fastfetch | The startup logo + PC info tool | winget `Fastfetch-cli.Fastfetch`, or the latest `windows-amd64.zip` from [fastfetch-cli/fastfetch](https://github.com/fastfetch-cli/fastfetch) |
+| Oh My Posh | The prompt program | winget `JanDeDobbeleer.OhMyPosh` from the explicit `winget` source (no direct executable fallback) |
+| Fastfetch | The startup logo + PC info tool | winget `Fastfetch-cli.Fastfetch` from the explicit `winget` source (no direct executable fallback) |
 | Terminal-Icons | File and folder icons in `Get-ChildItem` | [PowerShell Gallery: Terminal-Icons](https://www.powershellgallery.com/packages/Terminal-Icons) |
 | Nerd Fonts **list** | Every official zip name | [Nerd Fonts v3.5.1 release](https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.5.1) |
 | Meslo | The recommended icon font | `https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/Meslo.zip` |
@@ -83,11 +91,30 @@ Lists are cached under `%LOCALAPPDATA%\BetterTerminal` so the next run does not 
 
 ### 4. The picker window opens
 
-A dark picker window opens. The live preview is at the top. Under it, a hint tells you what the current tab does, then six tabs:
+A dark studio window opens with a large terminal preview on the left and six customization tabs on the right. Drag the divider to resize the panels. The window can be resized down to 1120 × 740.
+
+The tabs and search field adapt to the right panel's width. Search shows matching option counts and a clear message when nothing matches. Roomier rows and softer selection colors keep long catalogs readable. Unchanged preview text and prompt controls are reused to reduce unnecessary redraws.
+
+The studio has a separate preview title and appearance summary. **Fit preview to panel** adjusts text width while keeping at least an 8-point font; scrolling remains available for long output. Turn it off for a fixed 10-point preview. Press **Ctrl+F** to focus search, **Ctrl+Tab** to move to the next customization tab, or **Ctrl+Shift+Tab** to move back. These shortcuts work inside the studio.
+
+Each studio uses a unique temporary directory for Fastfetch preview inputs and cleans up its own files on close. The fallback preview avoids hardware queries on the UI thread when Fastfetch is unavailable. Applying a font preserves existing Windows Terminal font size, weight, and other font properties.
+
+### Studio verification
+
+Run the checks without installing tools or applying a look:
+
+```powershell
+pwsh -NoProfile -File .\tests\Test-Studio.ps1
+pwsh -NoProfile -File .\tests\Test-Settings.ps1
+```
+
+The UI harness opens and closes the studio, writes local render images and measurements under `qa-temp/current`, exercises search and keyboard navigation, and verifies preview cleanup. It blocks the functions that save the look and apply Windows Terminal settings. The settings suite tests font-property preservation, invalid color handling, the lightweight fallback, syntax, and selected forbidden security patterns. These are targeted checks, not a complete installer or security certification. See [STUDIO-REVIEW.md](STUDIO-REVIEW.md) for measured results and remaining gaps.
+
+Search waits 180 ms after typing and filters only the active list. Preview changes are coalesced into 120 ms updates. Fastfetch runs in a background process with a five-second timeout, so gathering hardware information does not block the window. Preview settings stay in memory until you click **Use this look**; Cancel leaves your terminal appearance and saved look unchanged. Tool downloads and custom art edits still happen when requested.
 
 | Tab | What you pick | Preview |
 | --- | --- | --- |
-| **Colors** | One scheme from the full iTerm2 / Windows Terminal Themes pack | Live colors in the mini terminal, and in Windows Terminal if it is open |
+| **Colors** | One scheme from the full iTerm2 / Windows Terminal Themes pack | Live colors inside the studio preview; Windows Terminal changes when you save |
 | **Fonts** | One official Nerd Font name | Sample text. The zip is **not** downloaded yet |
 | **Art** | One official Fastfetch logo, Auto, No logo, a small extra picture, or **your own named ASCII art** | Shown on the left of the Fastfetch preview |
 | **Fastfetch** | Turn each info line on or off with its own tick box, pick a **Quick set** (Default, Graphics, Neofetch, Small, All, Logo only), and choose a picture color and an info text color | Real `fastfetch --pipe` output that redraws every time you tick a line |
@@ -107,7 +134,7 @@ The helper then:
 1. Downloads the chosen Nerd Font zip **if that font is not already installed**.
 2. Writes colors, font, and transparency to **Windows Terminal defaults and every profile**.
 3. Writes Fastfetch config to `%USERPROFILE%\.config\fastfetch\`.
-4. Writes a `Better Terminal Setup` block into **both** PowerShell profiles (5.1 and 7). If this PC blocks PowerShell scripts, it first allows them for your account only (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`), because a blocked PC refuses to load that profile.
+4. Writes a `Better Terminal Setup` block into **both** PowerShell profiles (5.1 and 7). If policy blocks unsigned profiles, it reports this and leaves the policy unchanged. The profiles will load only when the applicable policy permits them.
 5. Writes Cursor’s terminal font only if that exact Windows family name is installed.
 6. Closes the picker and the preview.
 7. Tells you to **close the terminal and open it again**.
@@ -629,10 +656,10 @@ If the warning comes back, delete that line.
 
 | Problem | What to try |
 | --- | --- |
-| Script will not run | Right-click `Start-BetterTerminal.cmd` and choose **Run**, or unblock the `.ps1` file |
-| `running scripts is disabled on this system` when you open PowerShell | That PC blocks scripts, so the profile cannot load. The helper now fixes this for you. To fix it by hand, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` and answer **Y** |
+| Script will not run | Review the script policy guidance above; the launcher respects existing policy |
+| `running scripts is disabled on this system` when you open PowerShell | Policy blocks the profile. Review the script policy guidance above; the helper does not change it |
 | Same error on a work or school PC | A Windows group policy is forcing it. Only whoever manages that PC can change it. Colors and the font still work; only the prompt and Fastfetch lines need scripts |
-| Antivirus says `TrojanDownloader` or `NetLoader` | Older copies of this helper fetched the Oh My Posh installer and ran it from memory, which looks exactly like malware to Defender. The helper no longer does this: it saves the signed `posh-windows-amd64.exe` to disk and runs it from there. Update to the current `Install-BetterTerminal.ps1` |
+| Antivirus flags the installer | Record the detecting vendor and detection name, review the report, and rescan the current file. Do not disable protection. See the antivirus guidance above |
 | No picker window | Windows blocked WinForms. Allow it, then run again |
 | Icons are empty boxes | New tab, or sign out so Windows sees the new font |
 | Cursor font warning | The saved family is not installed. Remove `terminal.integrated.fontFamily` or pick `CaskaydiaCove NF` / `MesloLGM Nerd Font` |
